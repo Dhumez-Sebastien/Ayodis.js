@@ -1,0 +1,40 @@
+{
+    "name": "ayodis.js",
+    "version": "0.0.1",
+    "description": "Ayodis.js is a sample system as Key/Value.",
+    "author": "Dhumez Sébastien",
+
+    "bugs": "https://github.com/Dhumez-Sebastien/Ayodis.js/issues",
+    "license": "MIT",
+    "licenseUrl": "http://www.opensource.org/licenses/mit-license.php",
+
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/Dhumez-Sebastien/Ayodis.js"
+    },
+
+    "main": "bin/ayodis.js",
+
+    "scripts": {
+        "test": "grunt travis --verbose"
+    },
+
+    "dependencies": {},
+    "devDependencies": {
+        "grunt": "~0.4.1",
+        "grunt-contrib-jshint": "~0.8",
+        "grunt-contrib-uglify": "~0.2",
+        "grunt-contrib-connect": "~0.5",
+        "grunt-contrib-yuidoc": "~0.5",
+        "grunt-concat-sourcemap": "~0.4",
+        "grunt-contrib-concat": "~0.3",
+        "mocha": "~1.15",
+        "chai": "~1.8",
+        "karma": "~0.12",
+        "karma-chrome-launcher": "~0.1",
+        "karma-firefox-launcher": "~0.1",
+        "karma-mocha": "~0.1",
+        "karma-spec-reporter": "~0.0.6",
+        "grunt-contrib-watch": "~0.5.3"
+    }
+}
