@@ -32,8 +32,9 @@ class Ayodis {
      *
      * @param hash      Hash to Store field
      * @param field     Field where value must be added
+     * @param cb        Optional Callback
      */
-    public static hdel(hash : string, field : string) : number {
+    public static hdel(hash : string, field : string, cb ?: (err : any, res : number) => void) : number {
         // Reply
         var exist : number = 0;
 
@@ -44,6 +45,11 @@ class Ayodis {
             delete (this._hash[hash][field]);
         }
 
+        // If callback, send it
+        if (cb) {
+            cb(null, exist);
+        }
+
         return exist;
     }
 
@@ -52,9 +58,17 @@ class Ayodis {
      *
      * @param hash      Hash to Store field
      * @param field     Field where value must be added
+     * @param cb        Optional Callback
      */
-    public static hexists(hash : string, field : string) : number {
-        return (this._hash[hash] && this._hash[hash][field]) ? 1 : 0;
+    public static hexists(hash : string, field : string, cb ?: (err : any, res : number) => void) : number {
+        var reply : number = (this._hash[hash] && this._hash[hash][field]) ? 1 : 0;
+
+        // If callback, send it
+        if (cb) {
+            cb(null, reply);
+        }
+
+        return reply;
     }
 
     /**
@@ -62,10 +76,17 @@ class Ayodis {
      *
      * @param hash      Hash to Store field
      * @param field     Field where value must be added
-     * @param cb        Callback
+     * @param cb        Optional Callback
      */
-    public static hget(hash : string, field : string, cb : (err : any, res : any) => void) : void {
-        cb(0, (this._hash[hash] && this._hash[hash][field]) ? this._hash[hash][field] : null);
+    public static hget(hash : string, field : string, cb ?: (err : any, res : string) => void) : string {
+        var reply : string = (this._hash[hash] && this._hash[hash][field]) ? this._hash[hash][field] : null;
+
+        // If callback, send it
+        if (cb) {
+            cb(null, reply);
+        }
+
+        return reply;
     }
 
     /**
@@ -74,15 +95,21 @@ class Ayodis {
      * the hash.
      *
      * @param hash      Hash must be get
+     * @param cb        Optional Callback
      */
-    public static hgetall(hash : string) : any {
+    public static hgetall(hash : string, cb ?: (err : any, res : string[]) => void) : string[] {
         // Reply
-        var out : any[] = [];
+        var out : string[] = [];
 
         // Add key & value into array
         for (var key in this._hash[hash]) {
             out.push(key);
             out.push(this._hash[hash][key]);
+        }
+
+        // If callback, send it
+        if (cb) {
+            cb(null, out);
         }
 
         return out;
@@ -92,14 +119,20 @@ class Ayodis {
      * Returns all field names in the hash stored at key.
      *
      * @param hash      Hash must be get
+     * @param cb        Optional Callback
      */
-    public static hkeys(hash : string) : any {
+    public static hkeys(hash : string, cb ?: (err : any, res : string[]) => void) : string[] {
         // Reply
-        var out : any[] = [];
+        var out : string[] = [];
 
         // Add key & value into array
         for (var key in this._hash[hash]) {
             out.push(key);
+        }
+
+        // If callback, send it
+        if (cb) {
+            cb(null, out);
         }
 
         return out;
@@ -109,8 +142,9 @@ class Ayodis {
      * Returns the number of fields contained in the hash stored at key.
      *
      * @param hash      Hash must be get
+     * @param cb        Optional Callback
      */
-    public static hlen(hash : string) : number {
+    public static hlen(hash : string, cb ?: (err : any, res : number) => void) : number {
         // Reply
         var length : number = 0;
 
@@ -119,6 +153,11 @@ class Ayodis {
             if (this._hash[hash].hasOwnProperty(key)) {
                 length++;
             }
+        }
+
+        // If callback, send it
+        if (cb) {
+            cb(null, length);
         }
 
         return length;
@@ -130,16 +169,31 @@ class Ayodis {
      * a non-existing keys are treated as empty hashes, running HMGET against a non-existing
      * key will return a list of null values.
      *
+     * The last argument can contain an optional callback.
+     *
      * @param hash      Hash must be get
      */
     public static hmget(hash : string) : string[] {
         // Reply
-        var args : any = arguments,
-            out : string[] = [];
+        var args : IArguments = arguments,
+            out : string[] = [],
+            cb : (err : any, res : string[]) => void,
+            length : number = args.length;
+
+        // Check if last entry is a Callback
+        if (args[args.length -1] && !!(args[args.length -1] && args[args.length -1].constructor && args[args.length -1].call && args[args.length -1].apply)) {
+            cb = args[args.length -1];
+            length--;
+        }
 
         // Read all args (the first arguments is the hash)
-        for (var i = 1, ls = args.length; i < ls; i++) {
+        for (var i : number = 1, ls : number = length; i < ls; i++) {
             out.push((this._hash[hash] && this._hash[hash][args[i]]) ? this._hash[hash][args[i]] : null);
+        }
+
+        // If callback, send it
+        if (cb) {
+            cb(null, out);
         }
 
         return out;
@@ -153,8 +207,9 @@ class Ayodis {
      * @param hash      Hash to Store field
      * @param field     Field where value must be added
      * @param value     Value must be stored
+     * @param cb        Optional Callback
      */
-    public static hset(hash : string, field : string, value : any) : number {
+    public static hset(hash : string, field : string, value : any, cb ?: (err : any, res : number) => void) : number {
         // Check if value exist
         var exist : number = (this._hash[hash] && this._hash[hash][field]) ? 0 : 1;
 
@@ -166,8 +221,12 @@ class Ayodis {
         // Erase value
         this._hash[hash][field] = value;
 
+        // If callback, send it
+        if (cb) {
+            cb(null, exist);
+        }
+
         // Get back result
         return exist;
     }
-
 }
