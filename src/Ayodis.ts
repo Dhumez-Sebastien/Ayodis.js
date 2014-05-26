@@ -2,6 +2,14 @@
 
 class Ayodis {
 
+    public static __msg : {
+
+    } = {
+        ERR_HMSET : 'ERR wrong number of arguments for HMSET',
+
+        OK : 'OK'
+    };
+
     /**
      * List of Hash
      */
@@ -197,6 +205,93 @@ class Ayodis {
         }
 
         return out;
+    }
+
+    /**
+     * Sets the specified fields to their respective values in the hash stored at
+     * key. This command overwrites any existing fields in the hash. If key does
+     * not exist, a new key holding a hash is created.
+     *
+     * The last argument can contain an optional callback.
+     *
+     * @param hash      Hash must be get
+     */
+    public static hmset(hash : string) : string {
+        // Reply
+        var args : IArguments = arguments,
+            cb : (err : any, res : string) => void,
+            errMsg : string = 'ERR wrong number of arguments for HMSET',
+            length : number = args.length;
+
+        // Check if last entry is a Callback
+        if (args[args.length -1] && !!(args[args.length -1] && args[args.length -1].constructor && args[args.length -1].call && args[args.length -1].apply)) {
+            cb = args[args.length -1];
+            length--;
+        }
+
+        // Checks if the inputs are valid
+        for (var i : number = 1, ls : number = length, field : boolean = true; i < ls; i++) {
+            // Check if field is correct
+            if (field && Object.prototype.toString.call(args[i]) == '[object String]') {
+                field = false;
+                continue;
+            } else if (field && Object.prototype.toString.call(args[i]) != '[object String]') {
+
+                // If callback, send it
+                if (cb) {
+                    cb(errMsg, null);
+                }
+
+                return errMsg;
+            }
+
+            // This is entry, jump to next
+            if (!field) {
+                field = true;
+            }
+        }
+
+        // The last item must be an entry (not a field)
+        if (!field) {
+            // If callback, send it
+            if (cb) {
+                cb(errMsg, null);
+            }
+
+            return errMsg;
+        }
+
+
+        // Store field name temporary
+        var fieldName : string;
+
+        // Read all args (the first arguments is the hash)
+        for (var i : number = 1, ls : number = length, field : boolean = true; i < ls; i++) {
+            // Check if field is correct
+            if (field && Object.prototype.toString.call(args[i]) == '[object String]') {
+                fieldName = args[i];
+                field = false;
+                continue;
+            }
+
+            // Check if hash exist
+            if (!this._hash[hash]) {
+                this._hash[hash] = {};
+            }
+
+            // Push data
+            if (!field) {
+                this._hash[hash][fieldName] = args[i];
+                field = true;
+            }
+        }
+
+        // If callback, send it
+        if (cb) {
+            cb(null, 'OK');
+        }
+
+        return 'OK';
     }
 
     /**

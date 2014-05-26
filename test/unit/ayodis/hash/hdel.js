@@ -22,5 +22,4 @@ describe('ayodis/hdel/', function () {
             chai.assert(reply == 0, 'Assertion Error : Async Delete reply error (0)');
         });
     });
-
 });
