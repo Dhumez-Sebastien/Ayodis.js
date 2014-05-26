@@ -1,14 +1,3 @@
-/**
- * @license
- * ayodis.js - v0.0.1
- * Copyright (c) 2014-2015, Dhumez Sébastien
- * 
- *
- * Compiled: 2014-05-25
- *
- * ayodis.js is licensed under the MIT License.
- * http://www.opensource.org/licenses/mit-license.php
- */
 "use strict";
 var Ayodis = (function () {
     function Ayodis() {
@@ -32,8 +21,9 @@ var Ayodis = (function () {
     *
     * @param hash      Hash to Store field
     * @param field     Field where value must be added
+    * @param cb        Optional Callback
     */
-    Ayodis.hdel = function (hash, field) {
+    Ayodis.hdel = function (hash, field, cb) {
         // Reply
         var exist = 0;
 
@@ -44,6 +34,11 @@ var Ayodis = (function () {
             delete (this._hash[hash][field]);
         }
 
+        // If callback, send it
+        if (cb) {
+            cb(null, exist);
+        }
+
         return exist;
     };
 
@@ -52,9 +47,17 @@ var Ayodis = (function () {
     *
     * @param hash      Hash to Store field
     * @param field     Field where value must be added
+    * @param cb        Optional Callback
     */
-    Ayodis.hexists = function (hash, field) {
-        return (this._hash[hash] && this._hash[hash][field]) ? 1 : 0;
+    Ayodis.hexists = function (hash, field, cb) {
+        var reply = (this._hash[hash] && this._hash[hash][field]) ? 1 : 0;
+
+        // If callback, send it
+        if (cb) {
+            cb(null, reply);
+        }
+
+        return reply;
     };
 
     /**
@@ -62,10 +65,17 @@ var Ayodis = (function () {
     *
     * @param hash      Hash to Store field
     * @param field     Field where value must be added
-    * @param cb        Callback
+    * @param cb        Optional Callback
     */
     Ayodis.hget = function (hash, field, cb) {
-        cb(0, (this._hash[hash] && this._hash[hash][field]) ? this._hash[hash][field] : null);
+        var reply = (this._hash[hash] && this._hash[hash][field]) ? this._hash[hash][field] : null;
+
+        // If callback, send it
+        if (cb) {
+            cb(null, reply);
+        }
+
+        return reply;
     };
 
     /**
@@ -74,14 +84,20 @@ var Ayodis = (function () {
     * the hash.
     *
     * @param hash      Hash must be get
+    * @param cb        Optional Callback
     */
-    Ayodis.hgetall = function (hash) {
+    Ayodis.hgetall = function (hash, cb) {
         // Reply
         var out = [];
 
         for (var key in this._hash[hash]) {
             out.push(key);
             out.push(this._hash[hash][key]);
+        }
+
+        // If callback, send it
+        if (cb) {
+            cb(null, out);
         }
 
         return out;
@@ -91,13 +107,19 @@ var Ayodis = (function () {
     * Returns all field names in the hash stored at key.
     *
     * @param hash      Hash must be get
+    * @param cb        Optional Callback
     */
-    Ayodis.hkeys = function (hash) {
+    Ayodis.hkeys = function (hash, cb) {
         // Reply
         var out = [];
 
         for (var key in this._hash[hash]) {
             out.push(key);
+        }
+
+        // If callback, send it
+        if (cb) {
+            cb(null, out);
         }
 
         return out;
@@ -107,8 +129,9 @@ var Ayodis = (function () {
     * Returns the number of fields contained in the hash stored at key.
     *
     * @param hash      Hash must be get
+    * @param cb        Optional Callback
     */
-    Ayodis.hlen = function (hash) {
+    Ayodis.hlen = function (hash, cb) {
         // Reply
         var length = 0;
 
@@ -116,6 +139,11 @@ var Ayodis = (function () {
             if (this._hash[hash].hasOwnProperty(key)) {
                 length++;
             }
+        }
+
+        // If callback, send it
+        if (cb) {
+            cb(null, length);
         }
 
         return length;
@@ -127,14 +155,27 @@ var Ayodis = (function () {
     * a non-existing keys are treated as empty hashes, running HMGET against a non-existing
     * key will return a list of null values.
     *
+    * The last argument can contain an optional callback.
+    *
     * @param hash      Hash must be get
     */
     Ayodis.hmget = function (hash) {
         // Reply
-        var args = arguments, out = [];
+        var args = arguments, out = [], cb, length = args.length;
 
-        for (var i = 1, ls = args.length; i < ls; i++) {
+        // Check if last entry is a Callback
+        if (args[args.length - 1] && !!(args[args.length - 1] && args[args.length - 1].constructor && args[args.length - 1].call && args[args.length - 1].apply)) {
+            cb = args[args.length - 1];
+            length--;
+        }
+
+        for (var i = 1, ls = length; i < ls; i++) {
             out.push((this._hash[hash] && this._hash[hash][args[i]]) ? this._hash[hash][args[i]] : null);
+        }
+
+        // If callback, send it
+        if (cb) {
+            cb(null, out);
         }
 
         return out;
@@ -148,8 +189,9 @@ var Ayodis = (function () {
     * @param hash      Hash to Store field
     * @param field     Field where value must be added
     * @param value     Value must be stored
+    * @param cb        Optional Callback
     */
-    Ayodis.hset = function (hash, field, value) {
+    Ayodis.hset = function (hash, field, value, cb) {
         // Check if value exist
         var exist = (this._hash[hash] && this._hash[hash][field]) ? 0 : 1;
 
@@ -161,6 +203,11 @@ var Ayodis = (function () {
         // Erase value
         this._hash[hash][field] = value;
 
+        // If callback, send it
+        if (cb) {
+            cb(null, exist);
+        }
+
         // Get back result
         return exist;
     };
@@ -169,4 +216,6 @@ var Ayodis = (function () {
     Ayodis._key = {};
     return Ayodis;
 })();
-//# sourceMappingURL=Ayodis.js.map
+//
+
+//# sourceMappingURL=ayodis.dev.js.map
