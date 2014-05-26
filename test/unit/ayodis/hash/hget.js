@@ -5,12 +5,14 @@ describe('ayodis/hget/', function () {
         // Add value
         Ayodis.hset('hashTest', 'fieldTest', 'GoHome');
 
-        // Check value
+        // Check value Sync
+        chai.assert(Ayodis.hget('hashTest', 'fieldTest') == 'GoHome', 'Error : Hash/Field was found');
+        chai.assert(Ayodis.hget('hashTest', 'fieldTest_HEXISTS') == null, 'Error : Hash/Field was no found');
+
+        // Check value Async
         Ayodis.hget('hashTest', 'fieldTest', function(err, reply) {
             chai.assert(reply == 'GoHome', 'Error : Hash/Field was not added updated');
         });
-
-        // Null value
         Ayodis.hget('hashTest', 'fieldTestUndefined', function(err, reply) {
             chai.assert(reply == null, 'Error : Undefined field was found');
         });

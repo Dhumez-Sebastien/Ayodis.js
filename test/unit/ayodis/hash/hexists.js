@@ -1,15 +1,29 @@
 describe('ayodis/hexists/', function () {
     'use strict';
 
-    it('Add, Get and Remove Hash Field', function () {
+    it('Add Hash Field', function () {
         // Add value
         Ayodis.hset('hashTest', 'fieldTest_HEXISTS', 'GoHome');
+    });
 
-        // Check value
-        chai.assert(Ayodis.hexists('hashTest', 'fieldTest_HEXISTS') == 1, 'Error : Hash/Field was no found');
-        chai.assert(Ayodis.hexists('hashTest', 'fieldTest') == 0, 'Error : Hash/Field was found');
+    it('HEXISTS Sync', function () {
+        // Check value Sync
+        chai.assert(Ayodis.hexists('hashTest', 'fieldTest_HEXISTS') == 1, 'Assertion Error : Sync value error (1)');
+        chai.assert(Ayodis.hexists('hashTest', 'fieldTest') == 0, 'Assertion Error : Sync value error (0)');
+    });
 
+    it('HEXISTS Async', function () {
+        // Check value Async
+        Ayodis.hexists('hashTest', 'fieldTest_HEXISTS', function(err, reply) {
+            chai.assert(reply == 1, 'Assertion Error : Async value error (1)');
+        });
+        Ayodis.hexists('hashTest', 'fieldTest', function(err, reply) {
+            chai.assert(reply == 0, 'Assertion Error : Async value error (0)');
+        });
+    });
+
+    it('Remove Hash Field', function () {
         // Remove value
-        Ayodis.hdel('hashTest', 'fieldTest_HEXISTS')
+        Ayodis.hdel('hashTest', 'fieldTest_HEXISTS');
     });
 });
