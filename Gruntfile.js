@@ -7,7 +7,8 @@ module.exports = function(grunt) {
     grunt.loadTasks('tasks');
 
     var srcFiles = [
-            '<%= dirs.src %>/Ayodis.js'
+            '<%= dirs.src %>/Ayodis.js',
+            '<%= dirs.src %>/hashes/**/*.js'
         ],
         banner = [
             '/**',

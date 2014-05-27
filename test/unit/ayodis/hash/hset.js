@@ -17,6 +17,12 @@ describe('ayodis/hset/', function () {
         });
     });
 
+    it('Check Field', function () {
+        // Check value
+        chai.assert(Ayodis.hget('hashTest', 'field1') == 'World', 'Error : Hash/Field was incorrect (World)');
+        chai.assert(Ayodis.hget('hashTest', 'field2') == 'MMORPG', 'Error : Hash/Field was incorrect (MMORPG)');
+    });
+    
     it('Remove Field', function () {
         // Remove value
         chai.assert(Ayodis.hdel('hashTest', 'field1') == 1, 'Assertion Error : Delete reply error 1 :: field1');

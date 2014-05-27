@@ -1,18 +1,85 @@
+///<reference path='./def/defLoader.d.ts'/>
 /**
- * @license
- * ayodis.js - v0.0.1
- * Copyright (c) 2014-2015, Dhumez Sébastien
- * 
- *
- * Compiled: 2014-05-26
- *
- * ayodis.js is licensed under the MIT License.
- * http://www.opensource.org/licenses/mit-license.php
- */
-"use strict";
+* Ayodis
+*
+* @module		:: Ayodis
+* @description	:: Ayodis.js is a sample system as Key/Value.
+*/
 var Ayodis = (function () {
     function Ayodis() {
     }
+    /**
+    * Check if all arguments are available
+    *
+    * @returns {boolean}
+    * @private
+    */
+    Ayodis.__checkArgs = function () {
+        var args = arguments;
+
+        for (var i = 0, ls = args.length; i < ls; i++) {
+            if (_.isUndefined(args[i])) {
+                return false;
+            }
+        }
+
+        return true;
+    };
+
+    /**
+    * Check if the Hash is a String
+    *
+    * @param hash          Hash value
+    * @returns {boolean}
+    * @private
+    */
+    Ayodis.__checkHash = function (hash) {
+        return _.isString(hash);
+    };
+
+    /**
+    * Check if the Field is a String
+    *
+    * @param field          Field value
+    * @returns {boolean}
+    * @private
+    */
+    Ayodis.__checkField = function (field) {
+        return _.isString(field);
+    };
+
+    /**
+    * Check if the Value is a String || Number
+    *
+    * @param value          Value
+    * @returns {boolean}
+    * @private
+    */
+    Ayodis.__checkValue = function (value) {
+        return _.isString(value) || _.isNumber(value);
+    };
+
+    /**
+    * Send error
+    * @param err           Error if she exists
+    * @param val           Value if he exists
+    * @param cb            Callback must be send
+    * @returns {boolean}
+    * @private
+    */
+    Ayodis.__sendCallback = function (err, val, cb) {
+        if (cb) {
+            cb(err, val);
+        }
+
+        // If error, show error
+        if (err) {
+            console.error(err);
+        }
+
+        return val;
+    };
+
     /**
     * If key already exists and is a string, this command appends the value at the end of the
     * string. If key does not exist it is created and set as an empty string, so APPEND will
@@ -161,38 +228,6 @@ var Ayodis = (function () {
     };
 
     /**
-    * Returns the values associated with the specified fields in the hash stored at key.
-    * For every field that does not exist in the hash, a nil value is returned. Because
-    * a non-existing keys are treated as empty hashes, running HMGET against a non-existing
-    * key will return a list of null values.
-    *
-    * The last argument can contain an optional callback.
-    *
-    * @param hash      Hash must be get
-    */
-    Ayodis.hmget = function (hash) {
-        // Reply
-        var args = arguments, out = [], cb, length = args.length;
-
-        // Check if last entry is a Callback
-        if (args[args.length - 1] && !!(args[args.length - 1] && args[args.length - 1].constructor && args[args.length - 1].call && args[args.length - 1].apply)) {
-            cb = args[args.length - 1];
-            length--;
-        }
-
-        for (var i = 1, ls = length; i < ls; i++) {
-            out.push((this._hash[hash] && this._hash[hash][args[i]]) ? this._hash[hash][args[i]] : null);
-        }
-
-        // If callback, send it
-        if (cb) {
-            cb(null, out);
-        }
-
-        return out;
-    };
-
-    /**
     * Sets the specified fields to their respective values in the hash stored at
     * key. This command overwrites any existing fields in the hash. If key does
     * not exist, a new key holding a hash is created.
@@ -203,10 +238,10 @@ var Ayodis = (function () {
     */
     Ayodis.hmset = function (hash) {
         // Reply
-        var args = arguments, cb, errMsg = 'ERR wrong number of arguments for HMSET', length = args.length;
+        var args = arguments, cb, errMsg = this.__msg.ERR_ARGS + ' HMSET', length = args.length;
 
         // Check if last entry is a Callback
-        if (args[args.length - 1] && !!(args[args.length - 1] && args[args.length - 1].constructor && args[args.length - 1].call && args[args.length - 1].apply)) {
+        if (_.isFunction(args[args.length - 1])) {
             cb = args[args.length - 1];
             length--;
         }
@@ -271,39 +306,11 @@ var Ayodis = (function () {
 
         return 'OK';
     };
-
-    /**
-    /**
-    * Sets field in the hash stored at key to value. If key does not exist, a new
-    * key holding a hash is created. If field already exists in the hash, it is overwritten.
-    *
-    * @param hash      Hash to Store field
-    * @param field     Field where value must be added
-    * @param value     Value must be stored
-    * @param cb        Optional Callback
-    */
-    Ayodis.hset = function (hash, field, value, cb) {
-        // Check if value exist
-        var exist = (this._hash[hash] && this._hash[hash][field]) ? 0 : 1;
-
-        // Build hash
-        if (!this._hash[hash]) {
-            this._hash[hash] = {};
-        }
-
-        // Erase value
-        this._hash[hash][field] = value;
-
-        // If callback, send it
-        if (cb) {
-            cb(null, exist);
-        }
-
-        // Get back result
-        return exist;
-    };
     Ayodis.__msg = {
-        ERR_HMSET: 'ERR wrong number of arguments for HMSET',
+        ERR_ARGS: 'ERR wrong number of arguments for',
+        FIELD_MUST_BE_STRING: 'Field must be a String',
+        HASH_MUST_BE_STRING: 'Hash must be a String',
+        VALUE_MUST_BE_STRING_OR_NUMBER: 'Value must be a String or Number',
         OK: 'OK'
     };
 
@@ -312,4 +319,6 @@ var Ayodis = (function () {
     Ayodis._key = {};
     return Ayodis;
 })();
-//# sourceMappingURL=Ayodis.js.map
+//
+
+//# sourceMappingURL=ayodis.dev.js.map
