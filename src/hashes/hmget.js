@@ -5,23 +5,18 @@
 * a non-existing keys are treated as empty hashes, running HMGET against a non-existing
 * key will return a list of null values.
 *
-* The last argument can contain an optional callback.
+* All arguments are get with "arguments"
 *
-* @param hash      Hash must be get
+* The last argument can contain an optional callback.
 */
-Ayodis['hmget'] = function (hash) {
+Ayodis['hmget'] = function () {
     // Reply
-    var args = arguments, out = [], cb, length = args.length;
+    var args = arguments, hash = args[0] || null, out = [], cb, length = args.length;
 
     // Check if last entry is a Callback
     if (args[args.length - 1] && _.isFunction(args[args.length - 1])) {
         cb = args[args.length - 1];
         length--;
-    }
-
-    // Check args
-    if (!this.__checkArgs(hash)) {
-        return this.__sendCallback(this.__msg.ERR_ARGS + ' HMGET', null, cb);
     }
 
     for (var i = 1, ls = length; i < ls; i++) {

@@ -3,19 +3,23 @@ describe('ayodis/hmset/', function () {
 
     it('HMSET Sync', function () {
         // Add values Sync
-        chai.assert(Ayodis.hmset('hashTest', 'field1', 'Hello', 'field2', 'World') == Ayodis.__msg.OK, 'Assertion Error : Sync reply error');
-        chai.assert(Ayodis.hmset('hashTest', 'field1', 'field2', 'World') == Ayodis.__msg.ERR_ARGS+' HMSET', 'Assertion Error : Sync not reply error');
+        chai.assert(Ayodis.hmset('hashTest', 'field1', 'Hello', 'field2', 'World') === Ayodis.__msg.OK, 'Assertion Error : Sync reply error');
+        chai.assert(Ayodis.hmset('hashTest', 'field1', 'field2', 'World') === null, 'Assertion Error : Sync not reply error');
     });
 
     it('HMSET Async', function () {
         // Add values Async
         Ayodis.hmset('hashTest', 'field3', 'Ayolan', 'field4', 'MMORPG', function(err, res) {
-            chai.assert(err == null, 'Assertion Error : Async get error');
-            chai.assert(res == Ayodis.__msg.OK, 'Assertion Error : Async reply error');
+            chai.assert(err === null, 'Assertion Error : Async get error');
+            chai.assert(res === Ayodis.__msg.OK, 'Assertion Error : Async reply error');
         });
+
+        /**
+         * Error
+         */
         Ayodis.hmset('hashTest', 'field5', 'Hello', 'field4', function(err, res) {
-            chai.assert(err == Ayodis.__msg.ERR_ARGS+' HMSET', 'Assertion Error : Async cannot get error');
-            chai.assert(res == null, 'Assertion Error : Async reply res');
+            chai.assert(err !== null, 'Assertion Error : Async cannot get error');
+            chai.assert(res === null, 'Assertion Error : Async reply res');
         });
     });
 

@@ -8,8 +8,8 @@ describe('ayodis/hexists/', function () {
 
     it('HEXISTS Sync', function () {
         // Check value Sync
-        chai.assert(Ayodis.hexists('hashTest', 'fieldTest_HEXISTS') == 1, 'Assertion Error : Sync value error (1)');
-        chai.assert(Ayodis.hexists('hashTest', 'fieldTest') == 0, 'Assertion Error : Sync value error (0)');
+        chai.assert(Ayodis.hexists('hashTest', 'fieldTest_HEXISTS') === 1, 'Assertion Error : Sync value error (1) :: '+Ayodis.hexists('hashTest', 'fieldTest_HEXISTS'));
+        chai.assert(Ayodis.hexists('hashTest', 'fieldTest') === 0, 'Assertion Error : Sync value error (0)');
     });
 
     it('HEXISTS Async', function () {

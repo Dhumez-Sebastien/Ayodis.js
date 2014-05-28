@@ -10,11 +10,6 @@
 * @param cb        Optional Callback
 */
 Ayodis['hsetnx'] = function (hash, field, value, cb) {
-    // Check args
-    if (!this.__checkArgs(hash, field, value)) {
-        return this.__sendCallback(this.__msg.ERR_ARGS + ' HSETNX', null, cb);
-    }
-
     if (!this.__checkHash(hash)) {
         return this.__sendCallback(this.__msg.HASH_MUST_BE_STRING + ' :: ' + hash, null, cb);
     }
