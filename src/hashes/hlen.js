@@ -6,10 +6,6 @@
 * @param cb        Optional Callback
 */
 Ayodis['hlen'] = function (hash, cb) {
-    if (!this.__checkHash(hash)) {
-        return this.__sendCallback(this.__msg.HASH_MUST_BE_STRING + ' :: ' + hash, null, cb);
-    }
-
     // Reply
     var length = 0;
 

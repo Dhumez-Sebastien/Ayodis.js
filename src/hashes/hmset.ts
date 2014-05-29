@@ -16,14 +16,9 @@ Ayodis['hmset'] = function(hash : string) : string {
         length : number = args.length;
 
     // Check if last entry is a Callback
-    if (_.isFunction(args[args.length -1])) {
+    if (_.isFunction(args[(args.length -1)])) {
         cb = args[args.length -1];
         length--;
-    }
-
-    // Check Hash
-    if (!this.__checkHash(hash)) {
-        return this.__sendCallback(this.__msg.HASH_MUST_BE_STRING+' :: '+hash, null, cb);
     }
 
     /**

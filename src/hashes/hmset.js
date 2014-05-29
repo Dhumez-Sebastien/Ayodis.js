@@ -13,14 +13,9 @@ Ayodis['hmset'] = function (hash) {
     var args = arguments, cb, length = args.length;
 
     // Check if last entry is a Callback
-    if (_.isFunction(args[args.length - 1])) {
+    if (_.isFunction(args[(args.length - 1)])) {
         cb = args[args.length - 1];
         length--;
-    }
-
-    // Check Hash
-    if (!this.__checkHash(hash)) {
-        return this.__sendCallback(this.__msg.HASH_MUST_BE_STRING + ' :: ' + hash, null, cb);
     }
 
     for (var i = 1, ls = length, field = true; i < ls; i++) {

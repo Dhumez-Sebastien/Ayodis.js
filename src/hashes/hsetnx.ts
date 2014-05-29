@@ -11,14 +11,6 @@
  * @param cb        Optional Callback
  */
 Ayodis['hsetnx'] = function(hash : string, field : string, value : any, cb ?: (err : any, res : number) => void) : number {
-    if (!this.__checkHash(hash)) {
-        return this.__sendCallback(this.__msg.HASH_MUST_BE_STRING+' :: '+hash, null, cb);
-    }
-
-    if (!this.__checkField(field)) {
-        return this.__sendCallback(this.__msg.FIELD_MUST_BE_STRING+' :: '+field, null, cb);
-    }
-
     if (!this.__checkValue(value)) {
         return this.__sendCallback(this.__msg.VALUE_MUST_BE_STRING_OR_NUMBER+' :: Hash : '+hash+' :: Field : '+field, null, cb);
     }
