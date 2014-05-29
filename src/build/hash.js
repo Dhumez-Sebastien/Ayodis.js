@@ -4,46 +4,44 @@
 Ayodis['__overLoadCheckArgs'] = function() {
     var checkArgs = [
         {
-            check : ['args', 'hash'],
             method : 'hexists',
             limit : 2,
             old : Ayodis.hexists
         },
         {
-            check : ['args'],
             method : 'hget',
             limit : 2,
             old : Ayodis.hget
         },
         {
-            check : ['args'],
             method : 'hlen',
             limit : 1,
             old : Ayodis.hlen
         },
         {
-            check : ['args'],
             method : 'hmget',
             limit : 1,
             old : Ayodis.hmget
         },
         {
-            check : ['args'],
             method : 'hmset',
             limit : 1,
             old : Ayodis.hmset
         },
         {
-            check : ['args'],
             method : 'hset',
             limit : 3,
             old : Ayodis.hset
         },
         {
-            check : ['args'],
             method : 'hsetnx',
             limit : 3,
             old : Ayodis.hsetnx
+        },
+        {
+            method : 'hvals',
+            limit : 1,
+            old : Ayodis.hvals
         }
     ];
 
@@ -51,22 +49,18 @@ Ayodis['__overLoadCheckArgs'] = function() {
      * For each entry, we add method to check args before current method.
      */
     _.each(checkArgs, function(obj) {
+        Ayodis[obj.method] = function () {
 
-        for (var i = 0; i < obj.check.length; i++) {
+            console.log('Check Args (' + obj.limit + ') in method :: ' + obj.method.toUpperCase());
 
-            Ayodis[obj.method] = function () {
-
-                console.log('Check Args (' + obj.limit + ') in method :: ' + obj.method.toUpperCase());
-
-                for (var i = 0; i < obj.limit; i++) {
-                    if (!this.__checkArgs(arguments[i])) {
-                        return this.__sendCallback(this.__msg.ERR_ARGS + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
-                    }
+            for (var i = 0; i < obj.limit; i++) {
+                if (!this.__checkArgs(arguments[i])) {
+                    return this.__sendCallback(this.__msg.ERR_ARGS + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
                 }
+            }
 
-                return obj.old.apply(this, arguments);
-            };
-        }
+            return obj.old.apply(this, arguments);
+        };
     });
 
     return this;
@@ -139,13 +133,17 @@ Ayodis['__overLoadCheckHash'] = function() {
         {
             method: 'hsetnx',
             old: Ayodis.hsetnx
+        },
+        {
+            method : 'hvals',
+            old : Ayodis.hvals
         }
     ];
 
     _.each(checkHash, function (obj) {
         Ayodis[obj.method] = function () {
 
-            console.log('Check Hash (' + obj.limit + ') in method :: ' + obj.method.toUpperCase());
+            console.log('Check Hash (' + arguments[0] + ') in method :: ' + obj.method.toUpperCase());
 
             if (!this.__checkHash(arguments[0])) {
                 return this.__sendCallback(this.__msg.HASH_MUST_BE_STRING + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
