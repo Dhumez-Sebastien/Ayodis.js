@@ -5,7 +5,7 @@
  * key does not exist, a new key holding a hash is created. If field does not exist
  * the value is set to 0 before the operation is performed.
  *
- The range of values supported by HINCRBY is limited to 64 bit signed integers.
+ * The range of values supported by HINCRBY is limited to 64 bit signed integers.
  *
  * @param hash          Hash to Store field
  * @param field         Field where value must be added
@@ -28,7 +28,7 @@ Ayodis['hincrby'] = function(hash : string, field : string, value : any, cb ?: (
 
 
     if (!_.isUndefined(this._hash[hash][field])) {
-        if (!_.isNumber(this._hash[hash][field])) {
+        if (!_.isNumber(this._hash[hash][field]) || !_.isInteger(value)) {
             return this.__sendCallback('ERR hash value is not an integer', null, cb);
         }
 
