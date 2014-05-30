@@ -51,7 +51,7 @@ Ayodis['__overLoadCheckArgs'] = function() {
     _.each(checkArgs, function(obj) {
         Ayodis[obj.method] = function () {
 
-            console.log('Check Args (' + obj.limit + ') in method :: ' + obj.method.toUpperCase());
+            //console.log('Check Args (' + obj.limit + ') in method :: ' + obj.method.toUpperCase());
 
             for (var i = 0; i < obj.limit; i++) {
                 if (!this.__checkArgs(arguments[i])) {
@@ -92,7 +92,7 @@ Ayodis['__overLoadCheckHashField'] = function() {
     _.each(checkField, function (obj) {
         Ayodis[obj.method] = function () {
 
-            console.log('Check Field (' + obj.limit + ') in method :: ' + obj.method.toUpperCase());
+            //console.log('Check Field (' + obj.limit + ') in method :: ' + obj.method.toUpperCase());
 
             if (!this.__checkField(arguments[1])) {
                 return this.__sendCallback(this.__msg.FIELD_MUST_BE_STRING+' :: '+arguments[1], null, arguments[2]);
@@ -143,7 +143,7 @@ Ayodis['__overLoadCheckHash'] = function() {
     _.each(checkHash, function (obj) {
         Ayodis[obj.method] = function () {
 
-            console.log('Check Hash (' + arguments[0] + ') in method :: ' + obj.method.toUpperCase());
+            //console.log('Check Hash (' + arguments[0] + ') in method :: ' + obj.method.toUpperCase());
 
             if (!this.__checkHash(arguments[0])) {
                 return this.__sendCallback(this.__msg.HASH_MUST_BE_STRING + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
