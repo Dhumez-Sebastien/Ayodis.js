@@ -21,3 +21,23 @@ Ayodis.hset('myHash', 'field', 'My Super value', function(err, res) {
 var res = Ayodis.hget('myHash', 'field');
 console.log(res); // => My Super value
 ```
+
+#### Commands
+
+Doc about command : [Redis commands](http://redis.io/commands)
+
+Commands available : 
+
+- HDEL
+- HEXISTS
+- HGET
+- HGETALL
+- HINCRBY
+- HINCRBYFLOAT
+- HKEYS
+- HLEN
+- HMGET
+- HMSET
+- HSET
+- HSETNX
+- HVALS
