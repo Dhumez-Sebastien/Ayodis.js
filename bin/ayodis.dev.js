@@ -20,6 +20,23 @@ var Ayodis = (function () {
     function Ayodis() {
     }
     /**
+    * Add a key if it has not been found.
+    *
+    * @param key           Key
+    * @param type          Type of Key
+    * @returns boolean     True if key is added
+    * @private
+    */
+    Ayodis.__addKeyIfNotExist = function (key, type) {
+        if (_.isUndefined(this._key[key])) {
+            this._key[key] = new AyodisKey(key, type);
+            return true;
+        }
+
+        return false;
+    };
+
+    /**
     * Check if all arguments are available
     *
     * @returns {boolean}
@@ -35,6 +52,14 @@ var Ayodis = (function () {
         }
 
         return true;
+    };
+
+    Ayodis.__checkCallback = function (item) {
+        if (item && _.isFunction(item)) {
+            return item;
+        }
+
+        return null;
     };
 
     /**
@@ -57,6 +82,20 @@ var Ayodis = (function () {
     */
     Ayodis.__checkField = function (field) {
         return _.isString(field);
+    };
+
+    /**
+    * Check if key
+    * @param key       Key must be check
+    * @param type      Type of Key
+    * @private
+    */
+    Ayodis.__checkKey = function (key, type) {
+        if (this._key[key] && this._key[key].getType() !== type) {
+            return 'WRONGTYPE Operation against a key holding the wrong kind of value';
+        }
+
+        return 'OK';
     };
 
     /**
@@ -102,81 +141,6 @@ var Ayodis = (function () {
             return 0;
         }
     };
-
-    /**
-    * Removes the specified fields from the hash stored at key. Specified fields that do
-    * not exist within this hash are ignored. If key does not exist, it is treated as an
-    * empty hash and this command returns 0.
-    *
-    * @param hash      Hash to Store field
-    * @param field     Field where value must be added
-    * @param cb        Optional Callback
-    */
-    Ayodis.hdel = function (hash, field, cb) {
-        // Reply
-        var exist = 0;
-
-        // Check if hash/field exist and remove
-        if ((this._hash[hash] && this._hash[hash][field])) {
-            exist = 1;
-
-            delete (this._hash[hash][field]);
-        }
-
-        // If callback, send it
-        if (cb) {
-            cb(null, exist);
-        }
-
-        return exist;
-    };
-
-    /**
-    * Returns all fields and values of the hash stored at key. In the returned value, every
-    * field name is followed by its value, so the length of the reply is twice the size of
-    * the hash.
-    *
-    * @param hash      Hash must be get
-    * @param cb        Optional Callback
-    */
-    Ayodis.hgetall = function (hash, cb) {
-        // Reply
-        var out = [];
-
-        for (var key in this._hash[hash]) {
-            out.push(key);
-            out.push(this._hash[hash][key]);
-        }
-
-        // If callback, send it
-        if (cb) {
-            cb(null, out);
-        }
-
-        return out;
-    };
-
-    /**
-    * Returns all field names in the hash stored at key.
-    *
-    * @param hash      Hash must be get
-    * @param cb        Optional Callback
-    */
-    Ayodis.hkeys = function (hash, cb) {
-        // Reply
-        var out = [];
-
-        for (var key in this._hash[hash]) {
-            out.push(key);
-        }
-
-        // If callback, send it
-        if (cb) {
-            cb(null, out);
-        }
-
-        return out;
-    };
     Ayodis.__msg = {
         ERR_ARGS: 'ERR wrong number of arguments for',
         FIELD_MUST_BE_STRING: 'Field must be a String',
@@ -185,25 +149,145 @@ var Ayodis = (function () {
         OK: 'OK'
     };
 
-    Ayodis._hash = {};
+    Ayodis.__CONST = {
+        KEY: {
+            HASH: 'hash'
+        }
+    };
 
     Ayodis._key = {};
     return Ayodis;
 })();
 //# sourceMappingURL=Ayodis.js.map
 
+///<reference path='./def/defLoader.d.ts'/>
+/**
+* Class to build entry into Ayodis
+*/
+var AyodisKey = (function () {
+    function AyodisKey(keyName, keyType) {
+        this._field = {};
+        this.keyName = keyName;
+        this._type = keyType;
+    }
+    AyodisKey.prototype.countField = function () {
+        var length = 0;
+        for (var item in this._field) {
+            length++;
+        }
+
+        return length;
+    };
+
+    AyodisKey.prototype.getAllField = function () {
+        var out = [];
+
+        for (var key in this._field) {
+            out.push(key);
+        }
+
+        return out;
+    };
+
+    AyodisKey.prototype.getAllFieldAndValue = function () {
+        var out = [];
+
+        for (var key in this._field) {
+            out.push(key);
+            out.push(this._field[key]);
+        }
+
+        return out;
+    };
+
+    AyodisKey.prototype.getAllFieldValue = function () {
+        var out = [];
+
+        for (var key in this._field) {
+            out.push(this._field[key]);
+        }
+
+        return out;
+    };
+
+    AyodisKey.prototype.getField = function (field) {
+        return this._field[field];
+    };
+
+    AyodisKey.prototype.getType = function () {
+        return this._type;
+    };
+
+    AyodisKey.prototype.getValue = function () {
+        return this._value;
+    };
+
+    AyodisKey.prototype.removeField = function (field) {
+        if (_.isUndefined(this._field[field])) {
+            return false;
+        }
+
+        delete (this._field[field]);
+
+        return true;
+    };
+
+    AyodisKey.prototype.setField = function (field, value) {
+        this._field[field] = value;
+        return this._field[field];
+    };
+
+    AyodisKey.prototype.setValue = function (value) {
+        this._value = value;
+
+        return this;
+    };
+    return AyodisKey;
+})();
+//# sourceMappingURL=AyodisKey.js.map
+
+///<reference path='./../def/defLoader.d.ts'/>
+/**
+* Removes the specified fields from the hash stored at key. Specified fields that do
+* not exist within this hash are ignored. If key does not exist, it is treated as an
+* empty hash and this command returns 0.
+*
+* @param key           Key
+* @returns Integer     Number of key removed
+*/
+Ayodis['hdel'] = function (key) {
+    // Reply
+    var count = 0;
+
+    // Reply
+    var args = arguments, cb = this.__checkCallback(args[args.length - 1]), length = (_.isNull(cb)) ? args.length : (args.length - 1);
+
+    for (var i = 1; i < length; i++) {
+        if (!this.__checkField(args[i])) {
+            return this.__sendCallback(this.__msg.ERR_ARGS + ' HDEL' + ' :: ' + key, null, cb);
+        }
+    }
+
+    for (var i = 1; i < length; i++) {
+        count += (this._key[key] && this._key[key].removeField(args[i])) ? 1 : 0;
+    }
+
+    console.log(count);
+
+    return this.__sendCallback(null, count, cb);
+};
+//# sourceMappingURL=hdel.js.map
+
 ///<reference path='./../def/defLoader.d.ts'/>
 /**
 * Returns if field is an existing field in the hash stored at key.
 *
-* @param hash      Hash to Store field
+* @param key       Key
 * @param field     Field where value must be added
 * @param cb        Optional Callback
 */
-Ayodis['hexists'] = function (hash, field, cb) {
-    var hash = arguments[0], field = arguments[1], cb = arguments[2];
-
-    return this.__sendCallback(null, (this._hash[hash] && this._hash[hash][field]) ? 1 : 0, cb);
+Ayodis['hexists'] = function (key, field, cb) {
+    return this.__sendCallback(null, (this._key[key] && this._key[key].getField(field)) ? 1 : 0, cb);
 };
 //# sourceMappingURL=hexists.js.map
 
@@ -211,14 +295,28 @@ Ayodis['hexists'] = function (hash, field, cb) {
 /**
 * Returns the value associated with field in the hash stored at key.
 *
-* @param hash      Hash to Store field
+* @param key       Key
 * @param field     Field where value must be added
 * @param cb        Optional Callback
 */
-Ayodis['hget'] = function (hash, field, cb) {
-    return this.__sendCallback(null, (this._hash[hash] && this._hash[hash][field]) ? this._hash[hash][field] : null, cb);
+Ayodis['hget'] = function (key, field, cb) {
+    return this.__sendCallback(null, (this._key[key] && this._key[key].getField(field)) ? this._key[key].getField(field) : null, cb);
 };
 //# sourceMappingURL=hget.js.map
+
+///<reference path='./../def/defLoader.d.ts'/>
+/**
+* Returns all fields and values of the hash stored at key. In the returned value, every
+* field name is followed by its value, so the length of the reply is twice the size of
+* the hash.
+*
+* @param key       Key
+* @param cb        Optional Callback
+*/
+Ayodis['hgetall'] = function (key, cb) {
+    return this.__sendCallback(null, (this._key[key]) ? this._key[key].getAllFieldAndValue() : [], cb);
+};
+//# sourceMappingURL=hgetall.js.map
 
 ///<reference path='./../def/defLoader.d.ts'/>
 /**
@@ -228,33 +326,30 @@ Ayodis['hget'] = function (hash, field, cb) {
 *
 * The range of values supported by HINCRBY is limited to 64 bit signed integers.
 *
-* @param hash          Hash to Store field
+* @param key           Key
 * @param field         Field where value must be added
-* @param value         Value must be stored
+* @param increment     Increment value
 * @param cb            Optional Callback
 * @returns Integer     The value at field after the increment operation
 */
-Ayodis['hincrby'] = function (hash, field, value, cb) {
-    if (!_.isNumber(value) || !_.isInteger(value)) {
-        return this.__sendCallback('ERR value is not an integer or out of range :: Hash : ' + hash + ' :: Field : ' + field, null, cb);
+Ayodis['hincrby'] = function (key, field, increment, cb) {
+    if (!_.isNumber(increment) || !_.isInteger(increment)) {
+        return this.__sendCallback('ERR value is not an integer or out of range :: Key : ' + key + ' :: Field : ' + field, null, cb);
     }
 
-    // Check if value exist
-    var out;
+    // Add key if she doesn't exist
+    this.__addKeyIfNotExist(key, Ayodis.__CONST.KEY.HASH);
 
-    // Build hash
-    if (!this._hash[hash]) {
-        this._hash[hash] = {};
-    }
+    var fieldValue = this._key[key].getField(field), out;
 
-    if (!_.isUndefined(this._hash[hash][field])) {
-        if (!_.isNumber(this._hash[hash][field]) || !_.isInteger(value)) {
+    if (!_.isUndefined(fieldValue)) {
+        if (!_.isNumber(fieldValue) || !_.isInteger(increment)) {
             return this.__sendCallback('ERR hash value is not an integer', null, cb);
         }
 
-        out = this._hash[hash][field] += value;
+        out = this._key[key].setField(field, (fieldValue + increment));
     } else {
-        out = this._hash[hash][field] = value;
+        out = this._key[key].setField(field, increment);
     }
 
     // Get back result
@@ -274,33 +369,33 @@ Ayodis['hincrby'] = function (hash, field, value, cb) {
 * The exact behavior of this command is identical to the one of the INCRBYFLOAT
 * command, please refer to the documentation of INCRBYFLOAT for further information.
 *
-* @param hash          Hash to Store field
+* @param key           Key
 * @param field         Field where value must be added
-* @param value         Value must be stored
+* @param increment     Increment value
 * @param cb            Optional Callback
 * @returns String      The value of field after the increment.
 */
-Ayodis['hincrbyfloat'] = function (hash, field, value, cb) {
-    if (!_.isNumber(value)) {
-        return this.__sendCallback('ERR value is not an integer or out of range :: Hash : ' + hash + ' :: Field : ' + field, null, cb);
+Ayodis['hincrbyfloat'] = function (key, field, increment, cb) {
+    if (!_.isNumber(increment)) {
+        return this.__sendCallback('ERR value is not an integer or out of range :: Key : ' + key + ' :: Field : ' + field, null, cb);
     }
 
     // Check if value exist
     var out;
 
-    // Build hash
-    if (!this._hash[hash]) {
-        this._hash[hash] = {};
-    }
+    // Add key if she doesn't exist
+    this.__addKeyIfNotExist(key, Ayodis.__CONST.KEY.HASH);
 
-    if (!_.isUndefined(this._hash[hash][field])) {
-        if (!_.isNumber(this._hash[hash][field])) {
+    var fieldValue = this._key[key].getField(field);
+
+    if (!_.isUndefined(fieldValue)) {
+        if (!_.isNumber(fieldValue)) {
             return this.__sendCallback('ERR hash value is not an integer', null, cb);
         }
 
-        out = this._hash[hash][field] += value;
+        out = this._key[key].setField(field, (fieldValue + increment));
     } else {
-        out = this._hash[hash][field] = value;
+        out = this._key[key].setField(field, increment);
     }
 
     // Get back result
@@ -310,22 +405,25 @@ Ayodis['hincrbyfloat'] = function (hash, field, value, cb) {
 
 ///<reference path='./../def/defLoader.d.ts'/>
 /**
-* Returns the number of fields contained in the hash stored at key.
+* Returns all field names in the hash stored at key.
 *
-* @param hash      Hash must be get
+* @param key       Key
 * @param cb        Optional Callback
 */
-Ayodis['hlen'] = function (hash, cb) {
-    // Reply
-    var length = 0;
+Ayodis['hkeys'] = function (key, cb) {
+    return this.__sendCallback(null, (this._key[key]) ? this._key[key].getAllField() : [], cb);
+};
+//# sourceMappingURL=hkeys.js.map
 
-    for (var key in this._hash[hash]) {
-        if (this._hash[hash].hasOwnProperty(key)) {
-            length++;
-        }
-    }
-
-    return this.__sendCallback(null, length, cb);
+///<reference path='./../def/defLoader.d.ts'/>
+/**
+* Returns the number of fields contained in the hash stored at key.
+*
+* @param key       Key
+* @param cb        Optional Callback
+*/
+Ayodis['hlen'] = function (key, cb) {
+    return this.__sendCallback(null, (this._key[key]) ? this._key[key].countField() : 0, cb);
 };
 //# sourceMappingURL=hlen.js.map
 
@@ -339,19 +437,16 @@ Ayodis['hlen'] = function (hash, cb) {
 * All arguments are get with "arguments"
 *
 * The last argument can contain an optional callback.
+*
+* @param key               Key
+* @returns Array String    List of values associated with the given fields, in the same order as they are requested.
 */
-Ayodis['hmget'] = function () {
+Ayodis['hmget'] = function (key) {
     // Reply
-    var args = arguments, hash = args[0] || null, out = [], cb, length = args.length;
-
-    // Check if last entry is a Callback
-    if (args[args.length - 1] && _.isFunction(args[args.length - 1])) {
-        cb = args[args.length - 1];
-        length--;
-    }
+    var args = arguments, out = [], cb = this.__checkCallback(args[args.length - 1]), length = (_.isNull(cb)) ? args.length : (args.length - 1);
 
     for (var i = 1, ls = length; i < ls; i++) {
-        out.push((this._hash[hash] && this._hash[hash][args[i]]) ? this._hash[hash][args[i]] : null);
+        out.push((this._key[key]) ? this._key[key].getField(args[i]) : null);
     }
 
     return this.__sendCallback(null, out, cb);
@@ -366,31 +461,25 @@ Ayodis['hmget'] = function () {
 *
 * The last argument can contain an optional callback.
 *
-* @param hash      Hash must be get
+* @param key       Key
 */
-Ayodis['hmset'] = function (hash) {
+Ayodis['hmset'] = function (key) {
     // Reply
-    var args = arguments, cb, length = args.length;
-
-    // Check if last entry is a Callback
-    if (_.isFunction(args[(args.length - 1)])) {
-        cb = args[args.length - 1];
-        length--;
-    }
+    var args = arguments, cb = this.__checkCallback(args[args.length - 1]), length = (_.isNull(cb)) ? args.length : (args.length - 1);
 
     for (var i = 1, ls = length, field = true; i < ls; i++) {
         if (field && this.__checkField(args[i])) {
             field = false;
             continue;
         } else if (field && !this.__checkField(args[i])) {
-            return this.__sendCallback(this.__msg.ERR_ARGS + ' HMSET' + ' :: ' + hash, null, cb);
+            return this.__sendCallback(this.__msg.ERR_ARGS + ' HMSET' + ' :: ' + key, null, cb);
         }
 
         // This is entry, jump to next
         if (!field) {
             // Check entry
             if (field && !this.__checkValue(args[i])) {
-                return this.__sendCallback(this.__msg.VALUE_MUST_BE_STRING_OR_NUMBER + ' :: Hash : ' + hash + ' :: Field : ' + field, null, cb);
+                return this.__sendCallback(this.__msg.VALUE_MUST_BE_STRING_OR_NUMBER + ' :: Hash : ' + key + ' :: Field : ' + field, null, cb);
             }
 
             field = true;
@@ -399,7 +488,7 @@ Ayodis['hmset'] = function (hash) {
 
     // The last item must be an entry (not a field)
     if (!field) {
-        return this.__sendCallback(this.__msg.ERR_ARGS + ' HMSET' + ' :: ' + hash, null, cb);
+        return this.__sendCallback(this.__msg.ERR_ARGS + ' HMSET' + ' :: ' + key, null, cb);
     }
 
     // Store field name temporary
@@ -413,14 +502,12 @@ Ayodis['hmset'] = function (hash) {
             continue;
         }
 
-        // Check if hash exist
-        if (!this._hash[hash]) {
-            this._hash[hash] = {};
-        }
+        // Add key if she doesn't exist
+        this.__addKeyIfNotExist(key, Ayodis.__CONST.KEY.HASH);
 
         // Push data
         if (!field) {
-            this._hash[hash][fieldName] = args[i];
+            this._key[key].setField(fieldName, args[i]);
             field = true;
         }
     }
@@ -434,26 +521,24 @@ Ayodis['hmset'] = function (hash) {
 * Sets field in the hash stored at key to value. If key does not exist, a new
 * key holding a hash is created. If field already exists in the hash, it is overwritten.
 *
-* @param hash      Hash to Store field
+* @param key       Key
 * @param field     Field where value must be added
 * @param value     Value must be stored
 * @param cb        Optional Callback
 */
-Ayodis['hset'] = function (hash, field, value, cb) {
+Ayodis['hset'] = function (key, field, value, cb) {
     if (!this.__checkValue(value)) {
-        return this.__sendCallback(this.__msg.VALUE_MUST_BE_STRING_OR_NUMBER + ' :: Hash : ' + hash + ' :: Field : ' + field, null, cb);
+        return this.__sendCallback(this.__msg.VALUE_MUST_BE_STRING_OR_NUMBER + ' :: Hash : ' + key + ' :: Field : ' + field, null, cb);
     }
 
     // Check if value exist
-    var exist = (this._hash[hash] && this._hash[hash][field]) ? 0 : 1;
+    var exist = (this._key[key] && this._key[key].getField(field)) ? 0 : 1;
 
-    // Build hash
-    if (!this._hash[hash]) {
-        this._hash[hash] = {};
-    }
+    // Add key if she doesn't exist
+    this.__addKeyIfNotExist(key, Ayodis.__CONST.KEY.HASH);
 
-    // Erase value
-    this._hash[hash][field] = value;
+    // Erase value in field
+    this._key[key].setField(field, value);
 
     // Get back result
     return this.__sendCallback(null, exist, cb);
@@ -466,27 +551,25 @@ Ayodis['hset'] = function (hash, field, value, cb) {
 * exist. If key does not exist, a new key holding a hash is created. If field
 * already exists, this operation has no effect.
 *
-* @param hash      Hash to Store field
+* @param key       Key
 * @param field     Field where value must be added
 * @param value     Value must be stored
 * @param cb        Optional Callback
 */
-Ayodis['hsetnx'] = function (hash, field, value, cb) {
+Ayodis['hsetnx'] = function (key, field, value, cb) {
     if (!this.__checkValue(value)) {
-        return this.__sendCallback(this.__msg.VALUE_MUST_BE_STRING_OR_NUMBER + ' :: Hash : ' + hash + ' :: Field : ' + field, null, cb);
+        return this.__sendCallback(this.__msg.VALUE_MUST_BE_STRING_OR_NUMBER + ' :: Key : ' + key + ' :: Field : ' + field, null, cb);
     }
 
     // Check if value exist
-    var exist = (this._hash[hash] && this._hash[hash][field]) ? 0 : 1;
+    var exist = (this._key[key] && this._key[key].getField(field)) ? 0 : 1;
 
-    // Build hash
-    if (!this._hash[hash]) {
-        this._hash[hash] = {};
-    }
+    // Add key if she doesn't exist
+    this.__addKeyIfNotExist(key, Ayodis.__CONST.KEY.HASH);
 
     // If is a new field, add value
     if (exist === 1) {
-        this._hash[hash][field] = value;
+        this._key[key].setField(field, value);
     }
 
     // Get back result
@@ -498,22 +581,12 @@ Ayodis['hsetnx'] = function (hash, field, value, cb) {
 /**
 * Returns all values in the hash stored at key.
 *
-* @param hash              Hash to get value
+* @param key               Key
 * @param cb                Optional Callback
 * @returns Array           List of values in the hash, or an empty list when key does not exist.
 */
-Ayodis['hvals'] = function (hash, cb) {
-    if (this._hash[hash]) {
-        var out = [];
-
-        for (var field in this._hash[hash]) {
-            out.push(this._hash[hash][field]);
-        }
-
-        return this.__sendCallback(null, out, cb);
-    }
-
-    return this.__sendCallback(null, [], cb);
+Ayodis['hvals'] = function (key, cb) {
+    return (this._key[key]) ? this.__sendCallback(null, this._key[key].getAllFieldValue(), cb) : this.__sendCallback(null, [], cb);
 };
 //# sourceMappingURL=hvals.js.map
 
@@ -531,6 +604,16 @@ Ayodis['__overLoadCheckArgs'] = function() {
             method : 'hget',
             limit : 2,
             old : Ayodis.hget
+        },
+        {
+            method: 'hincrby',
+            limit : 3,
+            old: Ayodis.hincrby
+        },
+        {
+            method: 'hincrbyfloat',
+            limit : 3,
+            old: Ayodis.hincrbyfloat
         },
         {
             method : 'hlen',
@@ -599,6 +682,14 @@ Ayodis['__overLoadCheckHashField'] = function() {
             old: Ayodis.hget
         },
         {
+            method: 'hincrby',
+            old: Ayodis.hincrby
+        },
+        {
+            method: 'hincrbyfloat',
+            old: Ayodis.hincrbyfloat
+        },
+        {
             method: 'hset',
             old: Ayodis.hset
         },
@@ -627,52 +718,82 @@ Ayodis['__overLoadCheckHashField'] = function() {
 /**
  * Overload all method (in list after) to check hash
  */
-Ayodis['__overLoadCheckHash'] = function() {
-    var checkHash = [
+Ayodis['__overLoadCheckKey'] = function() {
+    var checkKey = [
         {
-            method: 'hexists',
-            old: Ayodis.hexists
-        },
-        {
-            method: 'hget',
-            old: Ayodis.hget
-        },
-        {
-            method: 'hlen',
-            old: Ayodis.hlen
-        },
-        {
-            method: 'hmset',
-            old: Ayodis.hmset
-        },
-        {
-            method: 'hset',
-            old: Ayodis.hset
-        },
-        {
-            method: 'hsetnx',
-            old: Ayodis.hsetnx
-        },
-        {
-            method : 'hvals',
-            old : Ayodis.hvals
+            keyType : Ayodis.__CONST.KEY.HASH,
+            keyData : [
+                {
+                    method: 'hexists',
+                    old: Ayodis.hexists
+                },
+                {
+                    method: 'hget',
+                    old: Ayodis.hget
+                },
+                {
+                    method: 'hincrby',
+                    old: Ayodis.hincrby
+                },
+                {
+                    method: 'hincrbyfloat',
+                    old: Ayodis.hincrbyfloat
+                },
+                {
+                    method: 'hlen',
+                    old: Ayodis.hlen
+                },
+                {
+                    method: 'hmget',
+                    old: Ayodis.hmget
+                },
+                {
+                    method: 'hmset',
+                    old: Ayodis.hmset
+                },
+                {
+                    method: 'hset',
+                    old: Ayodis.hset
+                },
+                {
+                    method: 'hsetnx',
+                    old: Ayodis.hsetnx
+                },
+                {
+                    method : 'hvals',
+                    old : Ayodis.hvals
+                }
+            ]
         }
     ];
 
-    _.each(checkHash, function (obj) {
-        Ayodis[obj.method] = function () {
+    _.each(checkKey, function (cfg) {
+        _.each(cfg.keyData, function (obj) {
+            Ayodis[obj.method] = function () {
 
-            //console.log('Check Hash (' + arguments[0] + ') in method :: ' + obj.method.toUpperCase());
+                //console.log('Check Hash (' + arguments[0] + ') in method :: ' + obj.method.toUpperCase());
+                if (!this.__checkHash(arguments[0])) {
+                    return this.__sendCallback(this.__msg.HASH_MUST_BE_STRING + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
+                }
 
-            if (!this.__checkHash(arguments[0])) {
-                return this.__sendCallback(this.__msg.HASH_MUST_BE_STRING + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
-            }
+                var keyCheck = this.__checkKey(arguments[0], cfg.keyType);
 
-            return obj.old.apply(this, arguments);
-        };
+                if (keyCheck !== 'OK') {
+                    return this.__sendCallback(keyCheck + ' in method ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
+                }
+
+                return obj.old.apply(this, arguments);
+            };
+        });
     });
 
     return this;
 };
 
-Ayodis.__overLoadCheckHashField().__overLoadCheckHash().__overLoadCheckArgs();
+/**
+ * Start generation of checking. That's check Args, Field and Key before configuration method.
+ */
+Ayodis
+    .__overLoadCheckHashField()
+    .__overLoadCheckKey()
+    .__overLoadCheckArgs();

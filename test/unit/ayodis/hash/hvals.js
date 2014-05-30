@@ -10,7 +10,7 @@ describe('ayodis/hvals/', function () {
 
     it('HVALS Sync', function () {
         // Get value Sync
-        chai.assert(Ayodis.hvals('hashTest').length === 2, 'Assertion Error : Sync cannot get all value (0)');
+        chai.assert(Ayodis.hvals('hashTest').length === 2, 'Assertion Error : Sync cannot get all value (0) :: '+Ayodis.hvals('hashTest').length);
         chai.assert(Ayodis.hvals('hashTest')[0] === 'GoHome', 'Assertion Error : Sync get wrong value (0)');
         chai.assert(Ayodis.hvals('hashTest')[1] === 'OutHome', 'Assertion Error : Sync get wrong value (1)');
 

@@ -11,33 +11,33 @@
  * The exact behavior of this command is identical to the one of the INCRBYFLOAT
  * command, please refer to the documentation of INCRBYFLOAT for further information.
  *
- * @param hash          Hash to Store field
+ * @param key           Key
  * @param field         Field where value must be added
- * @param value         Value must be stored
+ * @param increment     Increment value
  * @param cb            Optional Callback
  * @returns String      The value of field after the increment.
  */
-Ayodis['hincrbyfloat'] = function(hash : string, field : string, value : any, cb ?: (err : any, res : string) => void) : string {
-    if (!_.isNumber(value)) {
-        return this.__sendCallback('ERR value is not an integer or out of range :: Hash : '+hash+' :: Field : '+field, null, cb);
+Ayodis['hincrbyfloat'] = function(key : string, field : string, increment : any, cb ?: (err : any, res : string) => void) : string {
+    if (!_.isNumber(increment)) {
+        return this.__sendCallback('ERR value is not an integer or out of range :: Key : '+key+' :: Field : '+field, null, cb);
     }
 
     // Check if value exist
     var out : string;
 
-    // Build hash
-    if (!this._hash[hash]) {
-        this._hash[hash] = {};
-    }
+    // Add key if she doesn't exist
+    this.__addKeyIfNotExist(key, Ayodis.__CONST.KEY.HASH);
 
-    if (!_.isUndefined(this._hash[hash][field])) {
-        if (!_.isNumber(this._hash[hash][field])) {
+    var fieldValue : any = this._key[key].getField(field);
+
+    if (!_.isUndefined(fieldValue)) {
+        if (!_.isNumber(fieldValue)) {
             return this.__sendCallback('ERR hash value is not an integer', null, cb);
         }
 
-        out = this._hash[hash][field] += value;
+        out = this._key[key].setField(field, (fieldValue + increment));
     } else {
-        out = this._hash[hash][field] = value;
+        out = this._key[key].setField(field, increment);
     }
 
     // Get back result

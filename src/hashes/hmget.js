@@ -8,19 +8,16 @@
 * All arguments are get with "arguments"
 *
 * The last argument can contain an optional callback.
+*
+* @param key               Key
+* @returns Array String    List of values associated with the given fields, in the same order as they are requested.
 */
-Ayodis['hmget'] = function () {
+Ayodis['hmget'] = function (key) {
     // Reply
-    var args = arguments, hash = args[0] || null, out = [], cb, length = args.length;
-
-    // Check if last entry is a Callback
-    if (args[args.length - 1] && _.isFunction(args[args.length - 1])) {
-        cb = args[args.length - 1];
-        length--;
-    }
+    var args = arguments, out = [], cb = this.__checkCallback(args[args.length - 1]), length = (_.isNull(cb)) ? args.length : (args.length - 1);
 
     for (var i = 1, ls = length; i < ls; i++) {
-        out.push((this._hash[hash] && this._hash[hash][args[i]]) ? this._hash[hash][args[i]] : null);
+        out.push((this._key[key]) ? this._key[key].getField(args[i]) : null);
     }
 
     return this.__sendCallback(null, out, cb);

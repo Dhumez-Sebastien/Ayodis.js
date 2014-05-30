@@ -1,7 +1,6 @@
 ///<reference path='./../Ayodis.ts'/>
+///<reference path='./../AyodisKey.ts'/>
 
-///<reference path='./../hashes/hsetnx.ts'/>
-
-declare var _, Promise;
+declare var _;
 
 

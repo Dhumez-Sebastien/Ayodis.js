@@ -6,33 +6,30 @@
 *
 * The range of values supported by HINCRBY is limited to 64 bit signed integers.
 *
-* @param hash          Hash to Store field
+* @param key           Key
 * @param field         Field where value must be added
-* @param value         Value must be stored
+* @param increment     Increment value
 * @param cb            Optional Callback
 * @returns Integer     The value at field after the increment operation
 */
-Ayodis['hincrby'] = function (hash, field, value, cb) {
-    if (!_.isNumber(value) || !_.isInteger(value)) {
-        return this.__sendCallback('ERR value is not an integer or out of range :: Hash : ' + hash + ' :: Field : ' + field, null, cb);
+Ayodis['hincrby'] = function (key, field, increment, cb) {
+    if (!_.isNumber(increment) || !_.isInteger(increment)) {
+        return this.__sendCallback('ERR value is not an integer or out of range :: Key : ' + key + ' :: Field : ' + field, null, cb);
     }
 
-    // Check if value exist
-    var out;
+    // Add key if she doesn't exist
+    this.__addKeyIfNotExist(key, Ayodis.__CONST.KEY.HASH);
 
-    // Build hash
-    if (!this._hash[hash]) {
-        this._hash[hash] = {};
-    }
+    var fieldValue = this._key[key].getField(field), out;
 
-    if (!_.isUndefined(this._hash[hash][field])) {
-        if (!_.isNumber(this._hash[hash][field]) || !_.isInteger(value)) {
+    if (!_.isUndefined(fieldValue)) {
+        if (!_.isNumber(fieldValue) || !_.isInteger(increment)) {
             return this.__sendCallback('ERR hash value is not an integer', null, cb);
         }
 
-        out = this._hash[hash][field] += value;
+        out = this._key[key].setField(field, (fieldValue + increment));
     } else {
-        out = this._hash[hash][field] = value;
+        out = this._key[key].setField(field, increment);
     }
 
     // Get back result

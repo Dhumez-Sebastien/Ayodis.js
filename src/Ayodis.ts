@@ -32,15 +32,37 @@ class Ayodis {
         OK : 'OK'
     };
 
-    /**
-     * List of Hash
-     */
-    private static _hash : any = {};
+    public static __CONST : {
+        KEY : {
+            HASH : string
+        }
+    } = {
+        KEY : {
+            HASH : 'hash'
+        }
+    };
 
     /**
      * List of Key
      */
     private static _key : any = {};
+
+    /**
+     * Add a key if it has not been found.
+     *
+     * @param key           Key
+     * @param type          Type of Key
+     * @returns boolean     True if key is added
+     * @private
+     */
+    private static __addKeyIfNotExist(key : string, type : string) : boolean {
+        if (_.isUndefined(this._key[key])) {
+            this._key[key] = new AyodisKey(key, type);
+            return true;
+        }
+
+        return false;
+    }
 
     /**
      * Check if all arguments are available
@@ -58,6 +80,14 @@ class Ayodis {
         }
 
         return true;
+    }
+
+    private static __checkCallback(item : any) : any {
+        if (item && _.isFunction(item)) {
+            return item;
+        }
+
+        return null;
     }
 
     /**
@@ -80,6 +110,20 @@ class Ayodis {
      */
     private static __checkField(field : string) : boolean {
         return _.isString(field);
+    }
+
+    /**
+     * Check if key
+     * @param key       Key must be check
+     * @param type      Type of Key
+     * @private
+     */
+    private static __checkKey(key : string, type : string) : string {
+        if (this._key[key] && this._key[key].getType() !== type) {
+            return 'WRONGTYPE Operation against a key holding the wrong kind of value';
+        }
+
+        return 'OK';
     }
 
     /**
@@ -114,8 +158,6 @@ class Ayodis {
         return val;
     }
 
-
-
     /**
      * If key already exists and is a string, this command appends the value at the end of the
      * string. If key does not exist it is created and set as an empty string, so APPEND will
@@ -128,89 +170,5 @@ class Ayodis {
             return 0;
         }
     }
-
-    /**
-     * Removes the specified fields from the hash stored at key. Specified fields that do
-     * not exist within this hash are ignored. If key does not exist, it is treated as an
-     * empty hash and this command returns 0.
-     *
-     * @param hash      Hash to Store field
-     * @param field     Field where value must be added
-     * @param cb        Optional Callback
-     */
-    public static hdel(hash : string, field : string, cb ?: (err : any, res : number) => void) : number {
-        // Reply
-        var exist : number = 0;
-
-        // Check if hash/field exist and remove
-        if ((this._hash[hash] && this._hash[hash][field])) {
-            exist = 1;
-
-            delete (this._hash[hash][field]);
-        }
-
-        // If callback, send it
-        if (cb) {
-            cb(null, exist);
-        }
-
-        return exist;
-    }
-
-    /**
-     * Returns all fields and values of the hash stored at key. In the returned value, every
-     * field name is followed by its value, so the length of the reply is twice the size of
-     * the hash.
-     *
-     * @param hash      Hash must be get
-     * @param cb        Optional Callback
-     */
-    public static hgetall(hash : string, cb ?: (err : any, res : string[]) => void) : string[] {
-        // Reply
-        var out : string[] = [];
-
-        // Add key & value into array
-        for (var key in this._hash[hash]) {
-            out.push(key);
-            out.push(this._hash[hash][key]);
-        }
-
-        // If callback, send it
-        if (cb) {
-            cb(null, out);
-        }
-
-        return out;
-    }
-
-    /**
-     * Returns all field names in the hash stored at key.
-     *
-     * @param hash      Hash must be get
-     * @param cb        Optional Callback
-     */
-    public static hkeys(hash : string, cb ?: (err : any, res : string[]) => void) : string[] {
-        // Reply
-        var out : string[] = [];
-
-        // Add key & value into array
-        for (var key in this._hash[hash]) {
-            out.push(key);
-        }
-
-        // If callback, send it
-        if (cb) {
-            cb(null, out);
-        }
-
-        return out;
-    }
-
-
-
-
-
-
-
 }
 

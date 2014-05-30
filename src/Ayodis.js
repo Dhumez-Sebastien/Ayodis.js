@@ -9,6 +9,23 @@ var Ayodis = (function () {
     function Ayodis() {
     }
     /**
+    * Add a key if it has not been found.
+    *
+    * @param key           Key
+    * @param type          Type of Key
+    * @returns boolean     True if key is added
+    * @private
+    */
+    Ayodis.__addKeyIfNotExist = function (key, type) {
+        if (_.isUndefined(this._key[key])) {
+            this._key[key] = new AyodisKey(key, type);
+            return true;
+        }
+
+        return false;
+    };
+
+    /**
     * Check if all arguments are available
     *
     * @returns {boolean}
@@ -24,6 +41,14 @@ var Ayodis = (function () {
         }
 
         return true;
+    };
+
+    Ayodis.__checkCallback = function (item) {
+        if (item && _.isFunction(item)) {
+            return item;
+        }
+
+        return null;
     };
 
     /**
@@ -46,6 +71,20 @@ var Ayodis = (function () {
     */
     Ayodis.__checkField = function (field) {
         return _.isString(field);
+    };
+
+    /**
+    * Check if key
+    * @param key       Key must be check
+    * @param type      Type of Key
+    * @private
+    */
+    Ayodis.__checkKey = function (key, type) {
+        if (this._key[key] && this._key[key].getType() !== type) {
+            return 'WRONGTYPE Operation against a key holding the wrong kind of value';
+        }
+
+        return 'OK';
     };
 
     /**
@@ -91,81 +130,6 @@ var Ayodis = (function () {
             return 0;
         }
     };
-
-    /**
-    * Removes the specified fields from the hash stored at key. Specified fields that do
-    * not exist within this hash are ignored. If key does not exist, it is treated as an
-    * empty hash and this command returns 0.
-    *
-    * @param hash      Hash to Store field
-    * @param field     Field where value must be added
-    * @param cb        Optional Callback
-    */
-    Ayodis.hdel = function (hash, field, cb) {
-        // Reply
-        var exist = 0;
-
-        // Check if hash/field exist and remove
-        if ((this._hash[hash] && this._hash[hash][field])) {
-            exist = 1;
-
-            delete (this._hash[hash][field]);
-        }
-
-        // If callback, send it
-        if (cb) {
-            cb(null, exist);
-        }
-
-        return exist;
-    };
-
-    /**
-    * Returns all fields and values of the hash stored at key. In the returned value, every
-    * field name is followed by its value, so the length of the reply is twice the size of
-    * the hash.
-    *
-    * @param hash      Hash must be get
-    * @param cb        Optional Callback
-    */
-    Ayodis.hgetall = function (hash, cb) {
-        // Reply
-        var out = [];
-
-        for (var key in this._hash[hash]) {
-            out.push(key);
-            out.push(this._hash[hash][key]);
-        }
-
-        // If callback, send it
-        if (cb) {
-            cb(null, out);
-        }
-
-        return out;
-    };
-
-    /**
-    * Returns all field names in the hash stored at key.
-    *
-    * @param hash      Hash must be get
-    * @param cb        Optional Callback
-    */
-    Ayodis.hkeys = function (hash, cb) {
-        // Reply
-        var out = [];
-
-        for (var key in this._hash[hash]) {
-            out.push(key);
-        }
-
-        // If callback, send it
-        if (cb) {
-            cb(null, out);
-        }
-
-        return out;
-    };
     Ayodis.__msg = {
         ERR_ARGS: 'ERR wrong number of arguments for',
         FIELD_MUST_BE_STRING: 'Field must be a String',
@@ -174,7 +138,11 @@ var Ayodis = (function () {
         OK: 'OK'
     };
 
-    Ayodis._hash = {};
+    Ayodis.__CONST = {
+        KEY: {
+            HASH: 'hash'
+        }
+    };
 
     Ayodis._key = {};
     return Ayodis;

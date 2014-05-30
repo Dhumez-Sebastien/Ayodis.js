@@ -6,31 +6,25 @@
 *
 * The last argument can contain an optional callback.
 *
-* @param hash      Hash must be get
+* @param key       Key
 */
-Ayodis['hmset'] = function (hash) {
+Ayodis['hmset'] = function (key) {
     // Reply
-    var args = arguments, cb, length = args.length;
-
-    // Check if last entry is a Callback
-    if (_.isFunction(args[(args.length - 1)])) {
-        cb = args[args.length - 1];
-        length--;
-    }
+    var args = arguments, cb = this.__checkCallback(args[args.length - 1]), length = (_.isNull(cb)) ? args.length : (args.length - 1);
 
     for (var i = 1, ls = length, field = true; i < ls; i++) {
         if (field && this.__checkField(args[i])) {
             field = false;
             continue;
         } else if (field && !this.__checkField(args[i])) {
-            return this.__sendCallback(this.__msg.ERR_ARGS + ' HMSET' + ' :: ' + hash, null, cb);
+            return this.__sendCallback(this.__msg.ERR_ARGS + ' HMSET' + ' :: ' + key, null, cb);
         }
 
         // This is entry, jump to next
         if (!field) {
             // Check entry
             if (field && !this.__checkValue(args[i])) {
-                return this.__sendCallback(this.__msg.VALUE_MUST_BE_STRING_OR_NUMBER + ' :: Hash : ' + hash + ' :: Field : ' + field, null, cb);
+                return this.__sendCallback(this.__msg.VALUE_MUST_BE_STRING_OR_NUMBER + ' :: Hash : ' + key + ' :: Field : ' + field, null, cb);
             }
 
             field = true;
@@ -39,7 +33,7 @@ Ayodis['hmset'] = function (hash) {
 
     // The last item must be an entry (not a field)
     if (!field) {
-        return this.__sendCallback(this.__msg.ERR_ARGS + ' HMSET' + ' :: ' + hash, null, cb);
+        return this.__sendCallback(this.__msg.ERR_ARGS + ' HMSET' + ' :: ' + key, null, cb);
     }
 
     // Store field name temporary
@@ -53,14 +47,12 @@ Ayodis['hmset'] = function (hash) {
             continue;
         }
 
-        // Check if hash exist
-        if (!this._hash[hash]) {
-            this._hash[hash] = {};
-        }
+        // Add key if she doesn't exist
+        this.__addKeyIfNotExist(key, Ayodis.__CONST.KEY.HASH);
 
         // Push data
         if (!field) {
-            this._hash[hash][fieldName] = args[i];
+            this._key[key].setField(fieldName, args[i]);
             field = true;
         }
     }

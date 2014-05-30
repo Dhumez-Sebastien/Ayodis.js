@@ -14,6 +14,16 @@ Ayodis['__overLoadCheckArgs'] = function() {
             old : Ayodis.hget
         },
         {
+            method: 'hincrby',
+            limit : 3,
+            old: Ayodis.hincrby
+        },
+        {
+            method: 'hincrbyfloat',
+            limit : 3,
+            old: Ayodis.hincrbyfloat
+        },
+        {
             method : 'hlen',
             limit : 1,
             old : Ayodis.hlen
@@ -80,6 +90,14 @@ Ayodis['__overLoadCheckHashField'] = function() {
             old: Ayodis.hget
         },
         {
+            method: 'hincrby',
+            old: Ayodis.hincrby
+        },
+        {
+            method: 'hincrbyfloat',
+            old: Ayodis.hincrbyfloat
+        },
+        {
             method: 'hset',
             old: Ayodis.hset
         },
@@ -108,52 +126,82 @@ Ayodis['__overLoadCheckHashField'] = function() {
 /**
  * Overload all method (in list after) to check hash
  */
-Ayodis['__overLoadCheckHash'] = function() {
-    var checkHash = [
+Ayodis['__overLoadCheckKey'] = function() {
+    var checkKey = [
         {
-            method: 'hexists',
-            old: Ayodis.hexists
-        },
-        {
-            method: 'hget',
-            old: Ayodis.hget
-        },
-        {
-            method: 'hlen',
-            old: Ayodis.hlen
-        },
-        {
-            method: 'hmset',
-            old: Ayodis.hmset
-        },
-        {
-            method: 'hset',
-            old: Ayodis.hset
-        },
-        {
-            method: 'hsetnx',
-            old: Ayodis.hsetnx
-        },
-        {
-            method : 'hvals',
-            old : Ayodis.hvals
+            keyType : Ayodis.__CONST.KEY.HASH,
+            keyData : [
+                {
+                    method: 'hexists',
+                    old: Ayodis.hexists
+                },
+                {
+                    method: 'hget',
+                    old: Ayodis.hget
+                },
+                {
+                    method: 'hincrby',
+                    old: Ayodis.hincrby
+                },
+                {
+                    method: 'hincrbyfloat',
+                    old: Ayodis.hincrbyfloat
+                },
+                {
+                    method: 'hlen',
+                    old: Ayodis.hlen
+                },
+                {
+                    method: 'hmget',
+                    old: Ayodis.hmget
+                },
+                {
+                    method: 'hmset',
+                    old: Ayodis.hmset
+                },
+                {
+                    method: 'hset',
+                    old: Ayodis.hset
+                },
+                {
+                    method: 'hsetnx',
+                    old: Ayodis.hsetnx
+                },
+                {
+                    method : 'hvals',
+                    old : Ayodis.hvals
+                }
+            ]
         }
     ];
 
-    _.each(checkHash, function (obj) {
-        Ayodis[obj.method] = function () {
+    _.each(checkKey, function (cfg) {
+        _.each(cfg.keyData, function (obj) {
+            Ayodis[obj.method] = function () {
 
-            //console.log('Check Hash (' + arguments[0] + ') in method :: ' + obj.method.toUpperCase());
+                //console.log('Check Hash (' + arguments[0] + ') in method :: ' + obj.method.toUpperCase());
+                if (!this.__checkHash(arguments[0])) {
+                    return this.__sendCallback(this.__msg.HASH_MUST_BE_STRING + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
+                }
 
-            if (!this.__checkHash(arguments[0])) {
-                return this.__sendCallback(this.__msg.HASH_MUST_BE_STRING + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
-            }
+                var keyCheck = this.__checkKey(arguments[0], cfg.keyType);
 
-            return obj.old.apply(this, arguments);
-        };
+                if (keyCheck !== 'OK') {
+                    return this.__sendCallback(keyCheck + ' in method ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
+                }
+
+                return obj.old.apply(this, arguments);
+            };
+        });
     });
 
     return this;
 };
 
-Ayodis.__overLoadCheckHashField().__overLoadCheckHash().__overLoadCheckArgs();
+/**
+ * Start generation of checking. That's check Args, Field and Key before configuration method.
+ */
+Ayodis
+    .__overLoadCheckHashField()
+    .__overLoadCheckKey()
+    .__overLoadCheckArgs();
