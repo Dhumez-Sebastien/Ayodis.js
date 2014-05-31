@@ -2,6 +2,16 @@
 
 Ayodis is a sample lib based on redis to use a key/value system on client side.
 
+
+### Features
+    
+- Test coverage
+- Callbacks for everything
+- Multiple stores
+- Based on the Redis system architecture 
+- Store strings, numbers and objects
+- MIT license
+
 ## Getting Started
 
 ___________________________________________________________________________
