@@ -748,6 +748,21 @@ Ayodis['sadd'] = function (key) {
 
 ///<reference path='./../def/defLoader.d.ts'/>
 /**
+* Returns the set cardinality (number of elements) of the set stored at key.
+*
+* Arguments :: key
+*
+* @param key           Key
+* @param cb            Optional callback
+* @returns Integer     The cardinality (number of elements) of the set, or 0 if key does not exist.
+*/
+Ayodis['scard'] = function (key, cb) {
+    return this.__sendCallback(null, (this._key[key]) ? this._key[key].getAllMembers().length : 0, cb);
+};
+//# sourceMappingURL=scard.js.map
+
+///<reference path='./../def/defLoader.d.ts'/>
+/**
 * Returns all the members of the set value stored at key.
 *
 * Arguments :: key callback
@@ -861,6 +876,11 @@ Ayodis['__overLoadCheckArgs'] = function() {
             method : 'sadd',
             limit : 2,
             old : Ayodis.sadd
+        },
+        {
+            method : 'scard',
+            limit : 1,
+            old : Ayodis.scard
         },
         {
             method : 'smembers',
@@ -999,6 +1019,10 @@ Ayodis['__overLoadCheckKey'] = function() {
                 {
                     method: 'sadd',
                     old: Ayodis.sadd
+                },
+                {
+                    method: 'scard',
+                    old: Ayodis.scard
                 },
                 {
                     method: 'smembers',
