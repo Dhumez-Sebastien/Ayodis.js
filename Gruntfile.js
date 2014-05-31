@@ -8,8 +8,11 @@ module.exports = function(grunt) {
 
     var srcFiles = [
             '<%= dirs.src %>/Ayodis.js',
-            '<%= dirs.src %>/AyodisKey.js',
+            '<%= dirs.src %>/main/AyodisMainEntry.js',
+            '<%= dirs.src %>/main/AyodisEntryField.js',
+            '<%= dirs.src %>/main/AyodisEntryMember.js',
             '<%= dirs.src %>/hashes/**/*.js',
+            '<%= dirs.src %>/sets/**/*.js',
             '<%= dirs.src %>/build/**/*.js'
         ],
         banner = [

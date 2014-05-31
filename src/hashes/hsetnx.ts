@@ -19,7 +19,7 @@ Ayodis['hsetnx'] = function(key : string, field : string, value : any, cb ?: (er
     var exist : number = (this._key[key] && this._key[key].getField(field)) ? 0 : 1;
 
     // Add key if she doesn't exist
-    this.__addKeyIfNotExist(key, Ayodis.__CONST.KEY.HASH);
+    this.__addKeyIfNotExist(AyodisEntryField, key);
 
     // If is a new field, add value
     if (exist === 1) {

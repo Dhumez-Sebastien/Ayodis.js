@@ -28,6 +28,9 @@ Doc about command : [Redis commands](http://redis.io/commands)
 
 Commands available : 
 
+
+##### Hashes
+
 - HDEL
 - HEXISTS
 - HGET
@@ -41,3 +44,9 @@ Commands available :
 - HSET
 - HSETNX
 - HVALS
+
+##### Sets
+
+- SADD
+- SMEMBERS
+- SREM

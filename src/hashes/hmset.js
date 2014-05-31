@@ -48,7 +48,7 @@ Ayodis['hmset'] = function (key) {
         }
 
         // Add key if she doesn't exist
-        this.__addKeyIfNotExist(key, Ayodis.__CONST.KEY.HASH);
+        this.__addKeyIfNotExist(AyodisEntryField, key);
 
         // Push data
         if (!field) {

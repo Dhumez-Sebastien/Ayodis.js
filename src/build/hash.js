@@ -3,6 +3,9 @@
  */
 Ayodis['__overLoadCheckArgs'] = function() {
     var checkArgs = [
+    /**
+     * HASHES
+     */
         {
             method : 'hexists',
             limit : 2,
@@ -52,7 +55,26 @@ Ayodis['__overLoadCheckArgs'] = function() {
             method : 'hvals',
             limit : 1,
             old : Ayodis.hvals
+        },
+    /**
+     * SETS
+     */
+        {
+            method : 'sadd',
+            limit : 2,
+            old : Ayodis.sadd
+        },
+        {
+            method : 'smembers',
+            limit : 1,
+            old : Ayodis.smembers
+        },
+        {
+            method : 'srem',
+            limit : 2,
+            old : Ayodis.srem
         }
+
     ];
 
     /**
@@ -172,7 +194,25 @@ Ayodis['__overLoadCheckKey'] = function() {
                     old : Ayodis.hvals
                 }
             ]
+        },
+        {
+            keyType: Ayodis.__CONST.KEY.SET,
+            keyData: [
+                {
+                    method: 'sadd',
+                    old: Ayodis.sadd
+                },
+                {
+                    method: 'smembers',
+                    old: Ayodis.smembers
+                },
+                {
+                    method: 'srem',
+                    old: Ayodis.srem
+                }
+            ]
         }
+
     ];
 
     _.each(checkKey, function (cfg) {
@@ -181,7 +221,7 @@ Ayodis['__overLoadCheckKey'] = function() {
 
                 //console.log('Check Hash (' + arguments[0] + ') in method :: ' + obj.method.toUpperCase());
                 if (!this.__checkHash(arguments[0])) {
-                    return this.__sendCallback(this.__msg.HASH_MUST_BE_STRING + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
+                    return this.__sendCallback(this.__msg.KEY_MUST_BE_STRING + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
                 }
 
                 var keyCheck = this.__checkKey(arguments[0], cfg.keyType);

@@ -4,7 +4,7 @@
  * Copyright (c) 2014-2015, Dhumez Sébastien
  * https://plus.google.com/117777107050959596079
  *
- * Compiled: 2014-05-30
+ * Compiled: 2014-05-31
  *
  * ayodis.js is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -23,13 +23,13 @@ var Ayodis = (function () {
     * Add a key if it has not been found.
     *
     * @param key           Key
-    * @param type          Type of Key
+    * @param keyClass      Class must be used to build key
     * @returns boolean     True if key is added
     * @private
     */
-    Ayodis.__addKeyIfNotExist = function (key, type) {
+    Ayodis.__addKeyIfNotExist = function (keyClass, key) {
         if (_.isUndefined(this._key[key])) {
-            this._key[key] = new AyodisKey(key, type);
+            this._key[key] = new keyClass(key);
             return true;
         }
 
@@ -91,7 +91,7 @@ var Ayodis = (function () {
     * @private
     */
     Ayodis.__checkKey = function (key, type) {
-        if (this._key[key] && this._key[key].getType() !== type) {
+        if (!_.isUndefined(this._key[key]) && this._key[key].getType() !== type) {
             return 'WRONGTYPE Operation against a key holding the wrong kind of value';
         }
 
@@ -144,14 +144,15 @@ var Ayodis = (function () {
     Ayodis.__msg = {
         ERR_ARGS: 'ERR wrong number of arguments for',
         FIELD_MUST_BE_STRING: 'Field must be a String',
-        HASH_MUST_BE_STRING: 'Hash must be a String',
+        KEY_MUST_BE_STRING: 'Key must be a String',
         VALUE_MUST_BE_STRING_OR_NUMBER: 'Value must be a String or Number',
         OK: 'OK'
     };
 
     Ayodis.__CONST = {
         KEY: {
-            HASH: 'hash'
+            HASH: 'hash',
+            SET: 'set'
         }
     };
 
@@ -160,26 +161,63 @@ var Ayodis = (function () {
 })();
 //# sourceMappingURL=Ayodis.js.map
 
-///<reference path='./def/defLoader.d.ts'/>
+///<reference path='./../def/defLoader.d.ts'/>
+/**
+* Class to build main entry into Ayodis
+*/
+var AyodisMainEntry = (function () {
+    /**
+    * Basic constructor
+    *
+    * @param keyName   Name of Key
+    * @param keyType   Type of Key
+    */
+    function AyodisMainEntry(keyName, keyType) {
+        this._keyName = keyName;
+        this._type = keyType;
+    }
+    AyodisMainEntry.prototype.getType = function () {
+        return this._type;
+    };
+    return AyodisMainEntry;
+})();
+//# sourceMappingURL=AyodisMainEntry.js.map
+
+///<reference path='./../def/defLoader.d.ts'/>
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
 /**
 * Class to build entry into Ayodis
 */
-var AyodisKey = (function () {
-    function AyodisKey(keyName, keyType) {
+var AyodisEntryField = (function (_super) {
+    __extends(AyodisEntryField, _super);
+    /**
+    * Basic constructor.
+    *
+    * @param keyName   Name of Key
+    */
+    function AyodisEntryField(keyName) {
+        _super.call(this, keyName, Ayodis.__CONST.KEY.HASH);
+        /**
+        * Field are used by "Hash". They contain some value as member :: this._field['test'] = 10.
+        */
         this._field = {};
-        this.keyName = keyName;
-        this._type = keyType;
     }
-    AyodisKey.prototype.countField = function () {
-        var length = 0;
-        for (var item in this._field) {
-            length++;
-        }
-
-        return length;
+    /**
+    * Returns the number of fields.
+    */
+    AyodisEntryField.prototype.countField = function () {
+        return _.size(this._field);
     };
 
-    AyodisKey.prototype.getAllField = function () {
+    /**
+    * Returns all the key fields.
+    */
+    AyodisEntryField.prototype.getAllField = function () {
         var out = [];
 
         for (var key in this._field) {
@@ -189,7 +227,10 @@ var AyodisKey = (function () {
         return out;
     };
 
-    AyodisKey.prototype.getAllFieldAndValue = function () {
+    /**
+    * Returns all fields followed by values.
+    */
+    AyodisEntryField.prototype.getAllFieldAndValue = function () {
         var out = [];
 
         for (var key in this._field) {
@@ -200,7 +241,10 @@ var AyodisKey = (function () {
         return out;
     };
 
-    AyodisKey.prototype.getAllFieldValue = function () {
+    /**
+    * Returns all field values.
+    */
+    AyodisEntryField.prototype.getAllFieldValue = function () {
         var out = [];
 
         for (var key in this._field) {
@@ -210,19 +254,21 @@ var AyodisKey = (function () {
         return out;
     };
 
-    AyodisKey.prototype.getField = function (field) {
+    /**
+    * Return specific fields.
+    *
+    * @param field     Field must be found
+    */
+    AyodisEntryField.prototype.getField = function (field) {
         return this._field[field];
     };
 
-    AyodisKey.prototype.getType = function () {
-        return this._type;
-    };
-
-    AyodisKey.prototype.getValue = function () {
-        return this._value;
-    };
-
-    AyodisKey.prototype.removeField = function (field) {
+    /**
+    * Remove specific fields.
+    *
+    * @param field     Field must be removed
+    */
+    AyodisEntryField.prototype.removeField = function (field) {
         if (_.isUndefined(this._field[field])) {
             return false;
         }
@@ -232,19 +278,91 @@ var AyodisKey = (function () {
         return true;
     };
 
-    AyodisKey.prototype.setField = function (field, value) {
+    /**
+    * Apply a value to a field and return value.
+    *
+    * @param field     Field must be found
+    * @param value     Value must be apply
+    */
+    AyodisEntryField.prototype.setField = function (field, value) {
         this._field[field] = value;
         return this._field[field];
     };
+    return AyodisEntryField;
+})(AyodisMainEntry);
+//# sourceMappingURL=AyodisEntryField.js.map
 
-    AyodisKey.prototype.setValue = function (value) {
-        this._value = value;
-
-        return this;
+///<reference path='./../def/defLoader.d.ts'/>
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+/**
+* Class to build entry into Ayodis
+*/
+var AyodisEntryMember = (function (_super) {
+    __extends(AyodisEntryMember, _super);
+    /**
+    * Basic constructor.
+    *
+    * @param keyName   Name of Key
+    */
+    function AyodisEntryMember(keyName) {
+        _super.call(this, keyName, Ayodis.__CONST.KEY.SET);
+        /**
+        * Member is used by "Set". This is an array who contain some value.
+        */
+        this._member = [];
+    }
+    /**
+    * Adds a value if it has not been found
+    *
+    * @param value     Value must be added
+    */
+    AyodisEntryMember.prototype.addIfValueNotExist = function (value) {
+        if (_.indexOf(this._member, value) === -1) {
+            this._member.push(value);
+            return true;
+        }
+        return false;
     };
-    return AyodisKey;
-})();
-//# sourceMappingURL=AyodisKey.js.map
+
+    /**
+    * Returns all members
+    */
+    AyodisEntryMember.prototype.getAllMembers = function () {
+        var out = [];
+
+        for (var i = 0, ls = this._member.length; i < ls; i++) {
+            out.push(this._member[i]);
+        }
+
+        return out;
+    };
+
+    /**
+    * Removes a value if she has been found
+    *
+    * @param value     Value must be removed
+    */
+    AyodisEntryMember.prototype.removeValue = function (value) {
+        var index = _.indexOf(this._member, value);
+
+        // Check if value has been found found
+        if (index === -1) {
+            return false;
+        }
+
+        // Remove item from member
+        this._member.splice(index, 1);
+
+        return true;
+    };
+    return AyodisEntryMember;
+})(AyodisMainEntry);
+//# sourceMappingURL=AyodisEntryMember.js.map
 
 ///<reference path='./../def/defLoader.d.ts'/>
 /**
@@ -338,7 +456,7 @@ Ayodis['hincrby'] = function (key, field, increment, cb) {
     }
 
     // Add key if she doesn't exist
-    this.__addKeyIfNotExist(key, Ayodis.__CONST.KEY.HASH);
+    this.__addKeyIfNotExist(AyodisEntryField, key);
 
     var fieldValue = this._key[key].getField(field), out;
 
@@ -384,7 +502,7 @@ Ayodis['hincrbyfloat'] = function (key, field, increment, cb) {
     var out;
 
     // Add key if she doesn't exist
-    this.__addKeyIfNotExist(key, Ayodis.__CONST.KEY.HASH);
+    this.__addKeyIfNotExist(AyodisEntryField, key);
 
     var fieldValue = this._key[key].getField(field);
 
@@ -503,7 +621,7 @@ Ayodis['hmset'] = function (key) {
         }
 
         // Add key if she doesn't exist
-        this.__addKeyIfNotExist(key, Ayodis.__CONST.KEY.HASH);
+        this.__addKeyIfNotExist(AyodisEntryField, key);
 
         // Push data
         if (!field) {
@@ -535,7 +653,7 @@ Ayodis['hset'] = function (key, field, value, cb) {
     var exist = (this._key[key] && this._key[key].getField(field)) ? 0 : 1;
 
     // Add key if she doesn't exist
-    this.__addKeyIfNotExist(key, Ayodis.__CONST.KEY.HASH);
+    this.__addKeyIfNotExist(AyodisEntryField, key);
 
     // Erase value in field
     this._key[key].setField(field, value);
@@ -565,7 +683,7 @@ Ayodis['hsetnx'] = function (key, field, value, cb) {
     var exist = (this._key[key] && this._key[key].getField(field)) ? 0 : 1;
 
     // Add key if she doesn't exist
-    this.__addKeyIfNotExist(key, Ayodis.__CONST.KEY.HASH);
+    this.__addKeyIfNotExist(AyodisEntryField, key);
 
     // If is a new field, add value
     if (exist === 1) {
@@ -590,11 +708,102 @@ Ayodis['hvals'] = function (key, cb) {
 };
 //# sourceMappingURL=hvals.js.map
 
+///<reference path='./../def/defLoader.d.ts'/>
+/**
+* Add the specified members to the set stored at key. Specified
+* members that are already a member of this set are ignored. If
+* key does not exist, a new set is created before adding the
+* specified members.
+*
+* An error is returned when the value stored at key is not a set.
+*
+* Arguments :: key member [member ...]
+*
+* @param key           Key
+* @returns Integer     Number of key removed
+*/
+Ayodis['sadd'] = function (key) {
+    var args = arguments, cb = this.__checkCallback(args[args.length - 1]), count = 0, length = (_.isNull(cb)) ? args.length : (args.length - 1);
+
+    if (length < 2) {
+        return this.__sendCallback(this.__msg.ERR_ARGS + ' SADD', null, cb);
+    }
+
+    for (var i = 1; i < length; i++) {
+        if (!this.__checkValue(args[i])) {
+            return this.__sendCallback(this.__msg.VALUE_MUST_BE_STRING_OR_NUMBER + ' SADD' + ' :: ' + key, null, cb);
+        }
+    }
+
+    // Add key if she doesn't exist
+    this.__addKeyIfNotExist(AyodisEntryMember, key);
+
+    for (var i = 1; i < length; i++) {
+        count += (this._key[key].addIfValueNotExist(args[i])) ? 1 : 0;
+    }
+
+    return this.__sendCallback(null, count, cb);
+};
+//# sourceMappingURL=sadd.js.map
+
+///<reference path='./../def/defLoader.d.ts'/>
+/**
+* Returns all the members of the set value stored at key.
+*
+* Arguments :: key callback
+*
+* @param key           Key
+* @param cb            Optional callback
+* @returns Array       All elements of the set.
+*/
+Ayodis['smembers'] = function (key, cb) {
+    return this.__sendCallback(null, (this._key[key]) ? this._key[key].getAllMembers() : [], cb);
+};
+//# sourceMappingURL=smembers.js.map
+
+///<reference path='./../def/defLoader.d.ts'/>
+/**
+* Remove the specified members from the set stored at key. Specified
+* members that are not a member of this set are ignored. If key
+* does not exist, it is treated as an empty set and this command
+* returns 0.
+*
+* An error is returned when the value stored at key is not a set.
+*
+* Arguments :: key member [member ...]
+*
+* @param key           Key
+* @returns Integer     Number of key removed
+*/
+Ayodis['srem'] = function (key) {
+    var args = arguments, cb = this.__checkCallback(args[args.length - 1]), count = 0, length = (_.isNull(cb)) ? args.length : (args.length - 1);
+
+    if (length < 2) {
+        return this.__sendCallback(this.__msg.ERR_ARGS + ' SREM', null, cb);
+    }
+
+    for (var i = 1; i < length; i++) {
+        if (!this.__checkValue(args[i])) {
+            return this.__sendCallback(this.__msg.VALUE_MUST_BE_STRING_OR_NUMBER + ' SREM' + ' :: ' + key, null, cb);
+        }
+    }
+
+    for (var i = 1; i < length; i++) {
+        count += (this._key[key] instanceof AyodisEntryMember && this._key[key].removeValue(args[i])) ? 1 : 0;
+    }
+
+    return this.__sendCallback(null, count, cb);
+};
+//# sourceMappingURL=srem.js.map
+
 /**
  * Overload all method (in list after) to check args
  */
 Ayodis['__overLoadCheckArgs'] = function() {
     var checkArgs = [
+    /**
+     * HASHES
+     */
         {
             method : 'hexists',
             limit : 2,
@@ -644,7 +853,26 @@ Ayodis['__overLoadCheckArgs'] = function() {
             method : 'hvals',
             limit : 1,
             old : Ayodis.hvals
+        },
+    /**
+     * SETS
+     */
+        {
+            method : 'sadd',
+            limit : 2,
+            old : Ayodis.sadd
+        },
+        {
+            method : 'smembers',
+            limit : 1,
+            old : Ayodis.smembers
+        },
+        {
+            method : 'srem',
+            limit : 2,
+            old : Ayodis.srem
         }
+
     ];
 
     /**
@@ -764,7 +992,25 @@ Ayodis['__overLoadCheckKey'] = function() {
                     old : Ayodis.hvals
                 }
             ]
+        },
+        {
+            keyType: Ayodis.__CONST.KEY.SET,
+            keyData: [
+                {
+                    method: 'sadd',
+                    old: Ayodis.sadd
+                },
+                {
+                    method: 'smembers',
+                    old: Ayodis.smembers
+                },
+                {
+                    method: 'srem',
+                    old: Ayodis.srem
+                }
+            ]
         }
+
     ];
 
     _.each(checkKey, function (cfg) {
@@ -773,7 +1019,7 @@ Ayodis['__overLoadCheckKey'] = function() {
 
                 //console.log('Check Hash (' + arguments[0] + ') in method :: ' + obj.method.toUpperCase());
                 if (!this.__checkHash(arguments[0])) {
-                    return this.__sendCallback(this.__msg.HASH_MUST_BE_STRING + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
+                    return this.__sendCallback(this.__msg.KEY_MUST_BE_STRING + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
                 }
 
                 var keyCheck = this.__checkKey(arguments[0], cfg.keyType);

@@ -12,13 +12,13 @@ var Ayodis = (function () {
     * Add a key if it has not been found.
     *
     * @param key           Key
-    * @param type          Type of Key
+    * @param keyClass      Class must be used to build key
     * @returns boolean     True if key is added
     * @private
     */
-    Ayodis.__addKeyIfNotExist = function (key, type) {
+    Ayodis.__addKeyIfNotExist = function (keyClass, key) {
         if (_.isUndefined(this._key[key])) {
-            this._key[key] = new AyodisKey(key, type);
+            this._key[key] = new keyClass(key);
             return true;
         }
 
@@ -80,7 +80,7 @@ var Ayodis = (function () {
     * @private
     */
     Ayodis.__checkKey = function (key, type) {
-        if (this._key[key] && this._key[key].getType() !== type) {
+        if (!_.isUndefined(this._key[key]) && this._key[key].getType() !== type) {
             return 'WRONGTYPE Operation against a key holding the wrong kind of value';
         }
 
@@ -133,14 +133,15 @@ var Ayodis = (function () {
     Ayodis.__msg = {
         ERR_ARGS: 'ERR wrong number of arguments for',
         FIELD_MUST_BE_STRING: 'Field must be a String',
-        HASH_MUST_BE_STRING: 'Hash must be a String',
+        KEY_MUST_BE_STRING: 'Key must be a String',
         VALUE_MUST_BE_STRING_OR_NUMBER: 'Value must be a String or Number',
         OK: 'OK'
     };
 
     Ayodis.__CONST = {
         KEY: {
-            HASH: 'hash'
+            HASH: 'hash',
+            SET: 'set'
         }
     };
 

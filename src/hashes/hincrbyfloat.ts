@@ -26,7 +26,7 @@ Ayodis['hincrbyfloat'] = function(key : string, field : string, increment : any,
     var out : string;
 
     // Add key if she doesn't exist
-    this.__addKeyIfNotExist(key, Ayodis.__CONST.KEY.HASH);
+    this.__addKeyIfNotExist(AyodisEntryField, key);
 
     var fieldValue : any = this._key[key].getField(field);
 

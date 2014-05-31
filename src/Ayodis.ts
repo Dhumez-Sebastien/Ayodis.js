@@ -17,7 +17,7 @@ class Ayodis {
 
         ERR_ARGS : string
 
-        HASH_MUST_BE_STRING: string
+        KEY_MUST_BE_STRING: string
         FIELD_MUST_BE_STRING : string
         VALUE_MUST_BE_STRING_OR_NUMBER : string
         OK : string
@@ -25,7 +25,7 @@ class Ayodis {
         ERR_ARGS : 'ERR wrong number of arguments for',
 
         FIELD_MUST_BE_STRING : 'Field must be a String',
-        HASH_MUST_BE_STRING : 'Hash must be a String',
+        KEY_MUST_BE_STRING : 'Key must be a String',
         VALUE_MUST_BE_STRING_OR_NUMBER : 'Value must be a String or Number',
 
 
@@ -35,10 +35,12 @@ class Ayodis {
     public static __CONST : {
         KEY : {
             HASH : string
+            SET : string
         }
     } = {
         KEY : {
-            HASH : 'hash'
+            HASH : 'hash',
+            SET : 'set'
         }
     };
 
@@ -51,13 +53,13 @@ class Ayodis {
      * Add a key if it has not been found.
      *
      * @param key           Key
-     * @param type          Type of Key
+     * @param keyClass      Class must be used to build key
      * @returns boolean     True if key is added
      * @private
      */
-    private static __addKeyIfNotExist(key : string, type : string) : boolean {
+    private static __addKeyIfNotExist(keyClass : any, key : string) : boolean {
         if (_.isUndefined(this._key[key])) {
-            this._key[key] = new AyodisKey(key, type);
+            this._key[key] = new keyClass(key);
             return true;
         }
 
@@ -119,7 +121,7 @@ class Ayodis {
      * @private
      */
     private static __checkKey(key : string, type : string) : string {
-        if (this._key[key] && this._key[key].getType() !== type) {
+        if (!_.isUndefined(this._key[key]) && this._key[key].getType() !== type) {
             return 'WRONGTYPE Operation against a key holding the wrong kind of value';
         }
 
