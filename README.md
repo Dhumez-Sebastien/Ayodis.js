@@ -58,6 +58,7 @@ Ayodis.hget('myHash', 'field', function(err, res) {
 Doc about command : 
 
 - [Hashes](doc/HASHES.md)
+- [Sets](doc/SETS.md)
 
 ##### Hashes
 
@@ -77,7 +78,8 @@ Doc about command :
 
 ##### Sets
 
-- SADD
+- [SADD](doc/sets/SADD.md)
+- SCARD
 - SMEMBERS
 - SREM
 
