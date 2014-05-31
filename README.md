@@ -83,6 +83,7 @@ Doc about command :
 
 - [SADD](doc/sets/SADD.md)
 - SCARD
+- [SDIFF](doc/sets/SDIFF.md)
 - SMEMBERS
 - SREM
 

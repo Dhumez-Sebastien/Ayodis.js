@@ -132,6 +132,7 @@ var Ayodis = (function () {
     };
     Ayodis.__msg = {
         ERR_ARGS: 'ERR wrong number of arguments for',
+        EMPTY_SET_OR_LIST: 'empty list or set',
         FIELD_MUST_BE_STRING: 'Field must be a String',
         KEY_MUST_BE_STRING: 'Key must be a String',
         VALUE_MUST_BE_STRING_OR_NUMBER: 'Value must be a String or Number',

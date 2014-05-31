@@ -17,12 +17,15 @@ class Ayodis {
 
         ERR_ARGS : string
 
+        EMPTY_SET_OR_LIST : string
+
         KEY_MUST_BE_STRING: string
         FIELD_MUST_BE_STRING : string
         VALUE_MUST_BE_STRING_OR_NUMBER : string
         OK : string
     } = {
         ERR_ARGS : 'ERR wrong number of arguments for',
+        EMPTY_SET_OR_LIST : 'empty list or set',
 
         FIELD_MUST_BE_STRING : 'Field must be a String',
         KEY_MUST_BE_STRING : 'Key must be a String',

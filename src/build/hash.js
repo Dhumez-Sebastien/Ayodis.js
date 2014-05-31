@@ -70,6 +70,11 @@ Ayodis['__overLoadCheckArgs'] = function() {
             old : Ayodis.scard
         },
         {
+            method : 'sdiff',
+            limit : 2,
+            old : Ayodis.sdiff
+        },
+        {
             method : 'smembers',
             limit : 1,
             old : Ayodis.smembers
@@ -217,6 +222,10 @@ Ayodis['__overLoadCheckKey'] = function() {
                 {
                     method: 'scard',
                     old: Ayodis.scard
+                },
+                {
+                    method: 'sdiff',
+                    old: Ayodis.sdiff
                 },
                 {
                     method: 'smembers',

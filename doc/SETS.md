@@ -2,7 +2,7 @@
 
 **SCARD** *key [key ...] callback* : Subtract multiple sets
 
-**SDIFF** *destination key [key ...] callback* : Get the value of a hash field
+**[SDIFF](doc/sets/SDIFF.md)** *destination key [key ...] callback* : Get the value of a hash field
 
 **SDIFFSTORE** *key callback* : Subtract multiple sets and store the resulting set in a key
 
