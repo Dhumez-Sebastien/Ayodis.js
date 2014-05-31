@@ -1,4 +1,4 @@
-**[HDEL](doc/hashes/HDEL.md)** *key field [field ...] callback* : Delete one or more hash fields
+**[HDEL](hashes/HDEL.md)** *key field [field ...] callback* : Delete one or more hash fields
 
 **HEXISTS** *key field callback* : Determine if a hash field exists
 
