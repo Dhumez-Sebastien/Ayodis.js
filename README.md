@@ -59,12 +59,9 @@ Doc about command :
 
 - [Hashes](doc/HASHES.md)
 
-Commands available : 
-
-
 ##### Hashes
 
-- HDEL
+- [HDEL](doc/hashes/HDEL.md)
 - HEXISTS
 - HGET
 - HGETALL
