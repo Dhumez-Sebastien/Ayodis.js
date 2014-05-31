@@ -2,6 +2,9 @@
 
 Ayodis is a sample lib based on redis to use a key/value system on client side.
 
+If you’re interested in Ayodis.js then feel free to follow me on twitter
+([@Sawwby](https://twitter.com/Sawwby)) and I will keep you posted!
+
 
 ### Features
     
@@ -83,7 +86,11 @@ Doc about command :
 - SMEMBERS
 - SREM
 
-## LICENCE
+## How to Contribute
+
+Open a pull request and then wait for feedback.
+
+## LICENCE - "MIT License"
 
 The MIT License
 
