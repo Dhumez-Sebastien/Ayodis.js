@@ -24,10 +24,10 @@ describe('ayodis/hmget/', function () {
     it('HMGET Async', function () {
         // Check value Async
         Ayodis.hmget('hashTest', 'field1', 'field2', 'field3', function(err, reply) {
-            chai.assert(reply.length == 3, 'Assertion Error : Async Length error');
-            chai.assert(reply[0] == 'GoHome', 'Assertion Error : Async Value error (GoHome)');
-            chai.assert(reply[1] == 'OutHome', 'Assertion Error : Async Value error (OutHome)');
-            chai.assert(reply[2] == null, 'Assertion Error : Async Value error (null)');
+            chai.assert(reply.length === 3, 'Assertion Error : Async Length error');
+            chai.assert(reply[0] === 'GoHome', 'Assertion Error : Async Value error (GoHome)');
+            chai.assert(reply[1] === 'OutHome', 'Assertion Error : Async Value error (OutHome)');
+            chai.assert(reply[2] === null, 'Assertion Error : Async Value error (null) :: '+reply[2]);
         });
     });
 

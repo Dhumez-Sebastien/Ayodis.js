@@ -90,7 +90,14 @@ Ayodis['__overLoadCheckArgs'] = function() {
 
             //console.log('Check Args (' + obj.limit + ') in method :: ' + obj.method.toUpperCase());
 
-            for (var i = 0; i < obj.limit; i++) {
+            var limit = 0 + obj.limit;
+
+            // If the last arguments is optional callback, increment counter
+            if (_.isFunction(arguments[arguments.length -1])) {
+                limit++;
+            }
+
+            for (var i = 0; i < limit; i++) {
                 if (!this.__checkArgs(arguments[i])) {
                     return this.__sendCallback(this.__msg.ERR_ARGS + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
                 }

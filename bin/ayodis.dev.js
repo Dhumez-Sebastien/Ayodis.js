@@ -390,8 +390,6 @@ Ayodis['hdel'] = function (key) {
         count += (this._key[key] && this._key[key].removeField(args[i])) ? 1 : 0;
     }
 
-    console.log(count);
-
     return this.__sendCallback(null, count, cb);
 };
 //# sourceMappingURL=hdel.js.map
@@ -561,10 +559,10 @@ Ayodis['hlen'] = function (key, cb) {
 */
 Ayodis['hmget'] = function (key) {
     // Reply
-    var args = arguments, out = [], cb = this.__checkCallback(args[args.length - 1]), length = (_.isNull(cb)) ? args.length : (args.length - 1);
+    var args = arguments, out = [], cb = this.__checkCallback(args[args.length - 1]), length = (_.isFunction(cb)) ? (args.length - 1) : args.length;
 
-    for (var i = 1, ls = length; i < ls; i++) {
-        out.push((this._key[key]) ? this._key[key].getField(args[i]) : null);
+    for (var i = 1; i < length; i++) {
+        out.push((this._key[key] && !_.isUndefined(this._key[key].getField(args[i]))) ? this._key[key].getField(args[i]) : null);
     }
 
     return this.__sendCallback(null, out, cb);
@@ -725,10 +723,6 @@ Ayodis['hvals'] = function (key, cb) {
 Ayodis['sadd'] = function (key) {
     var args = arguments, cb = this.__checkCallback(args[args.length - 1]), count = 0, length = (_.isNull(cb)) ? args.length : (args.length - 1);
 
-    if (length < 2) {
-        return this.__sendCallback(this.__msg.ERR_ARGS + ' SADD', null, cb);
-    }
-
     for (var i = 1; i < length; i++) {
         if (!this.__checkValue(args[i])) {
             return this.__sendCallback(this.__msg.VALUE_MUST_BE_STRING_OR_NUMBER + ' SADD' + ' :: ' + key, null, cb);
@@ -792,10 +786,6 @@ Ayodis['smembers'] = function (key, cb) {
 */
 Ayodis['srem'] = function (key) {
     var args = arguments, cb = this.__checkCallback(args[args.length - 1]), count = 0, length = (_.isNull(cb)) ? args.length : (args.length - 1);
-
-    if (length < 2) {
-        return this.__sendCallback(this.__msg.ERR_ARGS + ' SREM', null, cb);
-    }
 
     for (var i = 1; i < length; i++) {
         if (!this.__checkValue(args[i])) {
@@ -903,7 +893,14 @@ Ayodis['__overLoadCheckArgs'] = function() {
 
             //console.log('Check Args (' + obj.limit + ') in method :: ' + obj.method.toUpperCase());
 
-            for (var i = 0; i < obj.limit; i++) {
+            var limit = 0 + obj.limit;
+
+            // If the last arguments is optional callback, increment counter
+            if (_.isFunction(arguments[arguments.length -1])) {
+                limit++;
+            }
+
+            for (var i = 0; i < limit; i++) {
                 if (!this.__checkArgs(arguments[i])) {
                     return this.__sendCallback(this.__msg.ERR_ARGS + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
                 }

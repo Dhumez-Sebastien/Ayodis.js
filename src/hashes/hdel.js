@@ -24,8 +24,6 @@ Ayodis['hdel'] = function (key) {
         count += (this._key[key] && this._key[key].removeField(args[i])) ? 1 : 0;
     }
 
-    console.log(count);
-
     return this.__sendCallback(null, count, cb);
 };
 //# sourceMappingURL=hdel.js.map

@@ -19,10 +19,6 @@ Ayodis['sadd'] = function(key : string) : number {
         count : number = 0,
         length : number = (_.isNull(cb)) ? args.length : (args.length -1);
 
-    if (length < 2) {
-        return this.__sendCallback(this.__msg.ERR_ARGS + ' SADD', null, cb);
-    }
-
     // Check if all field are secure
     for (var i : number = 1; i < length; i++) {
         if (!this.__checkValue(args[i])) {

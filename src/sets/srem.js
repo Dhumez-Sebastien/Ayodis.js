@@ -15,10 +15,6 @@
 Ayodis['srem'] = function (key) {
     var args = arguments, cb = this.__checkCallback(args[args.length - 1]), count = 0, length = (_.isNull(cb)) ? args.length : (args.length - 1);
 
-    if (length < 2) {
-        return this.__sendCallback(this.__msg.ERR_ARGS + ' SREM', null, cb);
-    }
-
     for (var i = 1; i < length; i++) {
         if (!this.__checkValue(args[i])) {
             return this.__sendCallback(this.__msg.VALUE_MUST_BE_STRING_OR_NUMBER + ' SREM' + ' :: ' + key, null, cb);

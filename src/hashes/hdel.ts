@@ -29,7 +29,5 @@ Ayodis['hdel'] = function(key : string) : number {
         count += (this._key[key] && this._key[key].removeField(args[i])) ? 1 : 0;
     }
 
-    console.log(count);
-
     return this.__sendCallback(null, count, cb);
 };

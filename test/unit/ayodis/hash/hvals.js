@@ -25,7 +25,7 @@ describe('ayodis/hvals/', function () {
         chai.assert(Ayodis.hvals() === null, 'Assertion Error : Sync no hash sending');
 
         // Wrong data type as hash
-        chai.assert(Ayodis.hsetnx(123) === null, 'Assertion Error : Sync wrong hash type');
+        chai.assert(Ayodis.hvals(123) === null, 'Assertion Error : Sync wrong hash type');
     });
 
     it('HVALS Async', function () {

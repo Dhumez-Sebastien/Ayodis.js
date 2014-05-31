@@ -3,11 +3,11 @@ describe('ayodis/hsetnx/', function () {
 
     it('HSETNX Sync', function () {
         // Add value Sync
-        chai.assert(Ayodis.hsetnx('hashTest', 'field1', 'Hello') == 1, 'Assertion Error : Sync field exists already error (1)');
-        chai.assert(Ayodis.hsetnx('hashTest', 'field1', 'World') == 0, 'Assertion Error : Sync field was not added correctly error (0)');
+        chai.assert(Ayodis.hsetnx('hashTest', 'field1', 'Hello') === 1, 'Assertion Error : Sync field exists already error (1)');
+        chai.assert(Ayodis.hsetnx('hashTest', 'field1', 'World') === 0, 'Assertion Error : Sync field was not added correctly error (0)');
 
-        chai.assert(Ayodis.hsetnx('hashTest', 'field1', JSON.stringify({ maison : "red"})) == 0, 'Assertion Error : Sync field was not added correctly error (0)');
-        chai.assert(Ayodis.hsetnx('hashTest', 'field1', '') == 0, 'Assertion Error : Sync field was not added correctly error (0)');
+        chai.assert(Ayodis.hsetnx('hashTest', 'field1', JSON.stringify({ maison : "red"})) === 0, 'Assertion Error : Sync field was not added correctly error (0)');
+        chai.assert(Ayodis.hsetnx('hashTest', 'field1', '') === 0, 'Assertion Error : Sync field was not added correctly error (0)');
 
         /**
          * Error entry
@@ -21,20 +21,20 @@ describe('ayodis/hsetnx/', function () {
     });
 
     it('HSETNX Async', function () {
-        // Add value Adync
+        // Add value Async
         Ayodis.hsetnx('hashTest', 'field2', 'Ayolan', function(err, res) {
-            chai.assert(res == 1, 'Assertion Error : Async field exists already error (1)');
+            chai.assert(res === 1, 'Assertion Error : Async field exists already error (1)');
         });
         Ayodis.hsetnx('hashTest', 'field2', 'MMORPG', function(err, res) {
-            chai.assert(res == 0, 'Assertion Error : Sync field was not added correctly error (0)');
+            chai.assert(res === 0, 'Assertion Error : Sync field was not added correctly error (0)');
         });
 
         /**
          * Error entry
          */
         Ayodis.hsetnx('hashTest', 'MMORPG', function(err, res) {
-            chai.assert(err == ERR_HSETNX, 'Assertion Error : Async :: err :: must show error');
-            chai.assert(res == null, 'Assertion Error : Async :: res :: must be empty');
+            chai.assert(err !== null, 'Assertion Error : Async :: err :: must show error');
+            chai.assert(res === null, 'Assertion Error : Async :: res :: must be empty');
         });
     });
 

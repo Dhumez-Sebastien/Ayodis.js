@@ -18,11 +18,11 @@ Ayodis['hmget'] = function(key : string) : string[] {
     var args : IArguments = arguments,
         out : string[] = [],
         cb : (err : any, res : string[]) => void = this.__checkCallback(args[args.length -1]),
-        length : number = (_.isNull(cb)) ? args.length : (args.length -1);
+        length : number = (_.isFunction(cb)) ? (args.length -1) : args.length;
 
     // Read all args (the first arguments is the hash)
-    for (var i : number = 1, ls : number = length; i < ls; i++) {
-        out.push((this._key[key]) ? this._key[key].getField(args[i]) : null);
+    for (var i : number = 1; i < length; i++) {
+        out.push((this._key[key] && !_.isUndefined(this._key[key].getField(args[i]))) ? this._key[key].getField(args[i]) : null);
     }
 
     return this.__sendCallback(null, out, cb);

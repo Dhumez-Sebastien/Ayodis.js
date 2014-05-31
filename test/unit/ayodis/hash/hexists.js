@@ -14,11 +14,13 @@ describe('ayodis/hexists/', function () {
 
     it('HEXISTS Async', function () {
         // Check value Async
-        Ayodis.hexists('hashTest', 'fieldTest_HEXISTS', function(err, reply) {
-            chai.assert(reply == 1, 'Assertion Error : Async value error (1)');
+        Ayodis.hexists('hashTest', 'fieldTest_HEXISTS', function(err, res) {
+            chai.assert(err === null, 'Assertion Error : Async get error (0)');
+            chai.assert(res === 1, 'Assertion Error : Async value error (1)');
         });
-        Ayodis.hexists('hashTest', 'fieldTest', function(err, reply) {
-            chai.assert(reply == 0, 'Assertion Error : Async value error (0)');
+        Ayodis.hexists('hashTest', 'fieldTest', function(err, res) {
+            chai.assert(err === null, 'Assertion Error : Async get error (1) :: '+err);
+            chai.assert(res === 0, 'Assertion Error : Async value error (0)');
         });
     });
 

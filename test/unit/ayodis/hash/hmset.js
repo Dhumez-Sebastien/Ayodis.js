@@ -25,22 +25,22 @@ describe('ayodis/hmset/', function () {
 
     it('Check Field', function () {
         // Check value
-        chai.assert(Ayodis.hget('hashTest', 'field1') == 'Hello', 'Error : Hash/Field was incorrect (Hello)');
-        chai.assert(Ayodis.hget('hashTest', 'field2') == 'World', 'Error : Hash/Field was incorrect (World)');
-        chai.assert(Ayodis.hget('hashTest', 'field3') == 'Ayolan', 'Error : Hash/Field was incorrect (Ayolan)');
-        chai.assert(Ayodis.hget('hashTest', 'field4') == 'MMORPG', 'Error : Hash/Field was incorrect (MMORPG)');
+        chai.assert(Ayodis.hget('hashTest', 'field1') === 'Hello', 'Error : Hash/Field was incorrect (Hello)');
+        chai.assert(Ayodis.hget('hashTest', 'field2') === 'World', 'Error : Hash/Field was incorrect (World)');
+        chai.assert(Ayodis.hget('hashTest', 'field3') === 'Ayolan', 'Error : Hash/Field was incorrect (Ayolan)');
+        chai.assert(Ayodis.hget('hashTest', 'field4') === 'MMORPG', 'Error : Hash/Field was incorrect (MMORPG)');
     });
 
     it('Remove Field', function () {
         // Remove value
-        chai.assert(Ayodis.hdel('hashTest', 'field1') == 1, 'Assertion Error : Delete reply error 1 :: field1');
-        chai.assert(Ayodis.hdel('hashTest', 'field2') == 1, 'Assertion Error : Delete reply error 1 :: field2');
-        chai.assert(Ayodis.hdel('hashTest', 'field3') == 1, 'Assertion Error : Delete reply error 1 :: field3');
-        chai.assert(Ayodis.hdel('hashTest', 'field4') == 1, 'Assertion Error : Delete reply error 1 :: field4');
+        chai.assert(Ayodis.hdel('hashTest', 'field1') === 1, 'Assertion Error : Delete reply error 1 :: field1');
+        chai.assert(Ayodis.hdel('hashTest', 'field2') === 1, 'Assertion Error : Delete reply error 1 :: field2');
+        chai.assert(Ayodis.hdel('hashTest', 'field3') === 1, 'Assertion Error : Delete reply error 1 :: field3');
+        chai.assert(Ayodis.hdel('hashTest', 'field4') === 1, 'Assertion Error : Delete reply error 1 :: field4');
     });
 
     it('Check if hash is empty', function () {
         // Check if fields are removed correctly
-        chai.assert(Ayodis.hgetall('hashTest').length == 0, 'Assertion Error : All fields have not been deleted');
+        chai.assert(Ayodis.hgetall('hashTest').length === 0, 'Assertion Error : All fields have not been deleted');
     });
 });
