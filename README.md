@@ -55,7 +55,9 @@ Ayodis.hget('myHash', 'field', function(err, res) {
 
 #### Commands
 
-Doc about command : [Redis commands](http://redis.io/commands)
+Doc about command : 
+
+- [Hashes](doc/HASHES.md)
 
 Commands available : 
 
