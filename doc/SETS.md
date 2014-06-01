@@ -4,7 +4,7 @@
 
 **[SDIFF](doc/sets/SDIFF.md)** *destination key [key ...] callback* : Get the value of a hash field
 
-**SDIFFSTORE** *key callback* : Subtract multiple sets and store the resulting set in a key
+**[SDIFFSTORE](doc/sets/SDIFFSTORE.md)** *key callback* : Subtract multiple sets and store the resulting set in a key
 
 **SINTER** *key [key ...] callback* : Intersect multiple sets
 

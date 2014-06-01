@@ -7,7 +7,7 @@
 * Arguments :: key [key ...]
 *
 * @param key           Key
-* @returns Integer     Number of key removed
+* @returns Array       List with members of the resulting set.
 */
 Ayodis['sdiff'] = function (key) {
     var args = arguments, cb = this.__checkCallback(args[args.length - 1]), length = (_.isNull(cb)) ? args.length : (args.length - 1);
@@ -15,12 +15,6 @@ Ayodis['sdiff'] = function (key) {
     // If key no exists, get an error
     if (_.isUndefined(this._key[key])) {
         return this.__sendCallback(this.__msg.EMPTY_SET_OR_LIST + ' :: SDIFF' + ' :: ' + key, null, cb);
-    }
-
-    for (var i = 0; i < length; i++) {
-        if (!this.__checkHash(args[i])) {
-            return this.__sendCallback(this.__msg.KEY_MUST_BE_STRING + ' SDIFF' + ' :: ' + key, null, cb);
-        }
     }
 
     // Push all elements in array

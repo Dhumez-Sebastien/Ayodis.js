@@ -1,10 +1,10 @@
 /**
  * @license
- * ayodis.js - v0.0.1
+ * ayodis.js - v0.0.4
  * Copyright (c) 2014-2015, Dhumez Sébastien
  * https://plus.google.com/117777107050959596079
  *
- * Compiled: 2014-05-31
+ * Compiled: 2014-06-01
  *
  * ayodis.js is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license.php
@@ -765,22 +765,17 @@ Ayodis['scard'] = function (key, cb) {
 * Arguments :: key [key ...]
 *
 * @param key           Key
-* @returns Integer     Number of key removed
+* @returns Array       List with members of the resulting set.
 */
 Ayodis['sdiff'] = function (key) {
     var args = arguments, cb = this.__checkCallback(args[args.length - 1]), length = (_.isNull(cb)) ? args.length : (args.length - 1);
 
-    // If key no exists
+    // If key no exists, get an error
     if (_.isUndefined(this._key[key])) {
         return this.__sendCallback(this.__msg.EMPTY_SET_OR_LIST + ' :: SDIFF' + ' :: ' + key, null, cb);
     }
 
-    for (var i = 0; i < length; i++) {
-        if (!this.__checkHash(args[i])) {
-            return this.__sendCallback(this.__msg.KEY_MUST_BE_STRING + ' SDIFF' + ' :: ' + key, null, cb);
-        }
-    }
-
+    // Push all elements in array
     var allElem = [];
 
     for (var i = 1; i < length; i++) {
@@ -793,6 +788,48 @@ Ayodis['sdiff'] = function (key) {
     return this.__sendCallback(null, _.difference((this._key[key] && this._key[key] instanceof AyodisEntryMember) ? this._key[key].getAllMembers() : [], _.uniq(allElem)), cb);
 };
 //# sourceMappingURL=sdiff.js.map
+
+///<reference path='./../def/defLoader.d.ts'/>
+/**
+* This command is equal to SDIFF, but instead of returning the resulting set, it is stored in destination.
+*
+* If destination already exists, it is overwritten.
+*
+* Arguments :: destination key [key ...]
+*
+* @param destination   Key Destination
+* @param keyBase       Key Base to compare
+* @returns Integer     The number of elements in the resulting set.
+*/
+Ayodis['sdiffstore'] = function (destination, keyBase) {
+    var args = arguments, cb = this.__checkCallback(args[args.length - 1]), length = (_.isNull(cb)) ? args.length : (args.length - 1);
+
+    // Push all elements in array
+    var allElem = [];
+
+    for (var i = 2; i < length; i++) {
+        var temp = (this._key[args[i]] && this._key[args[i]] instanceof AyodisEntryMember) ? this._key[args[i]].getAllMembers() : [];
+        for (var j = 0, lx = temp.length; j < lx; j++) {
+            allElem.push(temp[j]);
+        }
+    }
+
+    // Array difference
+    var entryDiff = _.difference((this._key[keyBase] && this._key[keyBase] instanceof AyodisEntryMember) ? this._key[keyBase].getAllMembers() : [], _.uniq(allElem)), count = 0;
+
+    if (entryDiff.length > 0) {
+        // Add key if she doesn't exist
+        this.__addKeyIfNotExist(AyodisEntryMember, destination);
+
+        for (var i = 0, ls = entryDiff.length; i < ls; i++) {
+            this._key[destination].addIfValueNotExist(entryDiff[i]);
+            count++;
+        }
+    }
+
+    return this.__sendCallback(null, count, cb);
+};
+//# sourceMappingURL=sdiffstore.js.map
 
 ///<reference path='./../def/defLoader.d.ts'/>
 /**
@@ -915,6 +952,11 @@ Ayodis['__overLoadCheckArgs'] = function() {
             method : 'sdiff',
             limit : 2,
             old : Ayodis.sdiff
+        },
+        {
+            method : 'sdiffstore',
+            limit : 3,
+            old : Ayodis.sdiffstore
         },
         {
             method : 'smembers',
@@ -1067,7 +1109,17 @@ Ayodis['__overLoadCheckKey'] = function() {
                 },
                 {
                     method: 'sdiff',
-                    old: Ayodis.sdiff
+                    old: Ayodis.sdiff,
+                    option : {
+                        type : 'allKeys'
+                    }
+                },
+                {
+                    method: 'sdiffstore',
+                    old: Ayodis.sdiffstore,
+                    option : {
+                        type : 'allKeys'
+                    }
                 },
                 {
                     method: 'smembers',
@@ -1087,14 +1139,28 @@ Ayodis['__overLoadCheckKey'] = function() {
             Ayodis[obj.method] = function () {
 
                 //console.log('Check Hash (' + arguments[0] + ') in method :: ' + obj.method.toUpperCase());
-                if (!this.__checkHash(arguments[0])) {
-                    return this.__sendCallback(this.__msg.KEY_MUST_BE_STRING + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
-                }
 
-                var keyCheck = this.__checkKey(arguments[0], cfg.keyType);
+                // Checking all keys
+                if (obj.option && obj.option.type === 'allKeys') {
+                    var length = (_.isFunction(arguments[arguments.length - 1])) ? (arguments.length - 1) : arguments.length;
 
-                if (keyCheck !== 'OK') {
-                    return this.__sendCallback(keyCheck + ' in method ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
+                    for (var i = 0; i < length; i++) {
+                        if (!this.__checkHash(arguments[i])) {
+                            return this.__sendCallback(this.__msg.KEY_MUST_BE_STRING + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
+                        } else if (this.__checkKey(arguments[i], cfg.keyType) !== 'OK') {
+                            return this.__sendCallback(this.__checkKey(arguments[i], cfg.keyType) + ' in method ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
+                        }
+                    }
+                } else {
+                    if (!this.__checkHash(arguments[0])) {
+                        return this.__sendCallback(this.__msg.KEY_MUST_BE_STRING + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
+                    }
+
+                    var keyCheck = this.__checkKey(arguments[0], cfg.keyType);
+
+                    if (keyCheck !== 'OK') {
+                        return this.__sendCallback(keyCheck + ' in method ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
+                    }
                 }
 
                 return obj.old.apply(this, arguments);

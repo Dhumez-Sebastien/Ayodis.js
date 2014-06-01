@@ -75,6 +75,11 @@ Ayodis['__overLoadCheckArgs'] = function() {
             old : Ayodis.sdiff
         },
         {
+            method : 'sdiffstore',
+            limit : 3,
+            old : Ayodis.sdiffstore
+        },
+        {
             method : 'smembers',
             limit : 1,
             old : Ayodis.smembers
@@ -225,7 +230,17 @@ Ayodis['__overLoadCheckKey'] = function() {
                 },
                 {
                     method: 'sdiff',
-                    old: Ayodis.sdiff
+                    old: Ayodis.sdiff,
+                    option : {
+                        type : 'allKeys'
+                    }
+                },
+                {
+                    method: 'sdiffstore',
+                    old: Ayodis.sdiffstore,
+                    option : {
+                        type : 'allKeys'
+                    }
                 },
                 {
                     method: 'smembers',
@@ -245,14 +260,28 @@ Ayodis['__overLoadCheckKey'] = function() {
             Ayodis[obj.method] = function () {
 
                 //console.log('Check Hash (' + arguments[0] + ') in method :: ' + obj.method.toUpperCase());
-                if (!this.__checkHash(arguments[0])) {
-                    return this.__sendCallback(this.__msg.KEY_MUST_BE_STRING + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
-                }
 
-                var keyCheck = this.__checkKey(arguments[0], cfg.keyType);
+                // Checking all keys
+                if (obj.option && obj.option.type === 'allKeys') {
+                    var length = (_.isFunction(arguments[arguments.length - 1])) ? (arguments.length - 1) : arguments.length;
 
-                if (keyCheck !== 'OK') {
-                    return this.__sendCallback(keyCheck + ' in method ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
+                    for (var i = 0; i < length; i++) {
+                        if (!this.__checkHash(arguments[i])) {
+                            return this.__sendCallback(this.__msg.KEY_MUST_BE_STRING + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
+                        } else if (this.__checkKey(arguments[i], cfg.keyType) !== 'OK') {
+                            return this.__sendCallback(this.__checkKey(arguments[i], cfg.keyType) + ' in method ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
+                        }
+                    }
+                } else {
+                    if (!this.__checkHash(arguments[0])) {
+                        return this.__sendCallback(this.__msg.KEY_MUST_BE_STRING + ' ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
+                    }
+
+                    var keyCheck = this.__checkKey(arguments[0], cfg.keyType);
+
+                    if (keyCheck !== 'OK') {
+                        return this.__sendCallback(keyCheck + ' in method ' + obj.method.toUpperCase(), null, arguments[arguments.length - 1]);
+                    }
                 }
 
                 return obj.old.apply(this, arguments);
