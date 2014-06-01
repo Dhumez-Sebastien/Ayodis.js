@@ -80,6 +80,11 @@ Ayodis['__overLoadCheckArgs'] = function() {
             old : Ayodis.sdiffstore
         },
         {
+            method : 'sinter',
+            limit : 2,
+            old : Ayodis.sinter
+        },
+        {
             method : 'smembers',
             limit : 1,
             old : Ayodis.smembers
@@ -238,6 +243,13 @@ Ayodis['__overLoadCheckKey'] = function() {
                 {
                     method: 'sdiffstore',
                     old: Ayodis.sdiffstore,
+                    option : {
+                        type : 'allKeys'
+                    }
+                },
+                {
+                    method: 'sinter',
+                    old: Ayodis.sinter,
                     option : {
                         type : 'allKeys'
                     }

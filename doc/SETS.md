@@ -6,7 +6,7 @@
 
 **[SDIFFSTORE](doc/sets/SDIFFSTORE.md)** *key callback* : Subtract multiple sets and store the resulting set in a key
 
-**SINTER** *key [key ...] callback* : Intersect multiple sets
+**[SINTER](doc/sets/SINTER.md)** *key [key ...] callback* : Intersect multiple sets
 
 **SINTERSTORE** *destination key [key ...] callback* : Intersect multiple sets and store the resulting set in a key
 

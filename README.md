@@ -85,6 +85,7 @@ Doc about command :
 - SCARD
 - [SDIFF](doc/sets/SDIFF.md)
 - [SDIFFSTORE](doc/sets/SDIFFSTORE.md)
+- [SINTER](doc/sets/SINTER.md)
 - SMEMBERS
 - SREM
 
