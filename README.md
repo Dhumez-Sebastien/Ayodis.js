@@ -66,11 +66,11 @@ Doc about command :
 ##### Hashes
 
 - [HDEL](doc/hashes/HDEL.md)
-- HEXISTS
-- HGET
-- HGETALL
-- HINCRBY
-- HINCRBYFLOAT
+- [HEXISTS](doc/hashes/HEXISTS.md)
+- [HGET](doc/hashes/HGET.md)
+- [HGETALL](doc/hashes/HGETALL.md)
+- [HINCRBY](doc/hashes/HINCRBY.md)
+- [HINCRBYFLOAT](doc/hashes/HINCRBYFLOAT.md)
 - HKEYS
 - HLEN
 - HMGET

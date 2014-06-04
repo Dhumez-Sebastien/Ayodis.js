@@ -1,14 +1,14 @@
 **[HDEL](hashes/HDEL.md)** *key field [field ...] callback* : Delete one or more hash fields
 
-**HEXISTS** *key field callback* : Determine if a hash field exists
+**[HEXISTS](hashes/HEXISTS.md)** *key field callback* : Determine if a hash field exists
 
-**HGET** *key field callback* : Get the value of a hash field
+**[HGET](hashes/HGET.md)** *key field callback* : Get the value of a hash field
 
-**HGETALL** *key callback* : Get all the fields and values in a hash
+**[HGETALL](hashes/HGETALL.md)** *key callback* : Get all the fields and values in a hash
 
-**HINCRBY** *key field increment callback* : Increment the integer value of a hash field by the given number
+**[HINCRBY](hashes/HINCRBY.md)** *key field increment callback* : Increment the integer value of a hash field by the given number
 
-**HINCRBYFLOAT** *key field increment callback* : Increment the float value of a hash field by the given amount
+**[HINCRBYFLOAT](hashes/HINCRBYFLOAT.md)** *key field increment callback* : Increment the float value of a hash field by the given amount
 
 **HKEYS** *key callback* : Get all the fields in a hash
 
