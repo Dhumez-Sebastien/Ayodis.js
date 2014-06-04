@@ -71,13 +71,13 @@ Doc about command :
 - [HGETALL](doc/hashes/HGETALL.md)
 - [HINCRBY](doc/hashes/HINCRBY.md)
 - [HINCRBYFLOAT](doc/hashes/HINCRBYFLOAT.md)
-- HKEYS
-- HLEN
-- HMGET
-- HMSET
-- HSET
-- HSETNX
-- HVALS
+- [HKEYS](doc/hashes/HKEYS.md)
+- [HLEN](doc/hashes/HLEN.md)
+- [HMGET](doc/hashes/HMGET.md)
+- [HMSET](doc/hashes/HMSET.md)
+- [HSET](doc/hashes/HSET.md)
+- [HSETNX](doc/hashes/HSETNX.md)
+- [HVALS](doc/hashes/HVALS.md)
 
 ##### Sets
 

@@ -10,16 +10,16 @@
 
 **[HINCRBYFLOAT](hashes/HINCRBYFLOAT.md)** *key field increment callback* : Increment the float value of a hash field by the given amount
 
-**HKEYS** *key callback* : Get all the fields in a hash
+**[HKEYS](hashes/HKEYS.md)** *key callback* : Get all the fields in a hash
 
-**HLEN** *key callback* : Get the number of fields in a hash
+**[HLEN](hashes/HLEN.md)** *key callback* : Get the number of fields in a hash
 
-**HMGET** *key field [field ...] callback* : Get the values of all the given hash fields
+**[HMGET](hashes/HMGET.md)** *key field [field ...] callback* : Get the values of all the given hash fields
 
-**HMSET** *key field value [field value ...] callback* : Set multiple hash fields to multiple values
+**[HMSET](hashes/HMSET.md)** *key field value [field value ...] callback* : Set multiple hash fields to multiple values
 
-**HSET** *key field value callback* : Set the string value of a hash field
+**[HSET](hashes/HSET.md)** *key field value callback* : Set the string value of a hash field
 
-**HSETNX** *key field value* callback : Set the value of a hash field, only if the field does not exist
+**[HSETNX](hashes/HSETNX.md)** *key field value* callback : Set the value of a hash field, only if the field does not exist
 
-**HVALS** *key callback* : Get all the values in a hash
+**[HVALS](hashes/HVALS.md)** *key callback* : Get all the values in a hash
